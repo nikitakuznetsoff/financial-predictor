@@ -1,8 +1,8 @@
 <template>
   <div class="graph">
-    <h5>
+    <h4>
         Test
-    </h5>
+    </h4>
   </div>
 </template>
 
