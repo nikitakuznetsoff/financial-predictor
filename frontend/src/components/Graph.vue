@@ -1,6 +1,9 @@
 <template>
   <div class="graph">
-    </div>
+    <h5>
+        Test
+    </h5>
+  </div>
 </template>
 
 <script>
