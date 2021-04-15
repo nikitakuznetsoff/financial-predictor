@@ -18,22 +18,26 @@
                 </b-navbar-item>
             </b-navbar-dropdown>
 
-            <b-navbar-item>
+            <form v-on:submit.prevent="onSubmit">
+              <b-navbar-item>
                 <b-input placeholder="Search for instruments"
-                    type="search"
+                    type="text"
                     icon="magnify"
                     icon-clickable
-                    @icon-click="searchIconClick">
+                    @icon-click="searchIconClick"
+                    v-model="search">
                 </b-input>
-            </b-navbar-item>
+              </b-navbar-item>
+            </form>
+            
         </template>
 
         <template #end>
             <b-navbar-item tag="div">
                 <div class="buttons">
-                    <a class="button is-primary">
+                    <router-link class="button is-primary" :to="{ path: '/register' }">
                         <strong>Sign up</strong>
-                    </a>
+                    </router-link>
                     <b-dropdown
                         position="is-bottom-left"
                         append-to-body
@@ -95,5 +99,15 @@
 <script>
 export default {
   name: 'Header',
+  data: function () {
+      return {
+          search: ""
+      } 
+  },
+  methods: {
+      onSubmit: function() {
+          this.$router.push('/quote/' + this.search)
+      }
+  }
 }
 </script>
