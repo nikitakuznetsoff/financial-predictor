@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from datetime import datetime
 
-from models import Task, User
+from app.models import Task, User
 
-class Repository:
+class PostgresRepository:
     def __init__(self):
         self.Session = None
 
@@ -55,7 +55,7 @@ class Repository:
                 session.commit()
 
         result = None
-        with.self.Session() as session:
+        with self.Session() as session:
             stmt = select(Task).filter_by(datetime=dt)
             result = session.execute(stmt).first()
         return result
@@ -66,5 +66,5 @@ class Repository:
         with self.Session() as session:
             stmt = select(Task).filter_by(id=id)
             result = session.execute(stmt).first()
-        returnr result
+        return result
         

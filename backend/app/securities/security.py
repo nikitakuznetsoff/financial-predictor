@@ -19,7 +19,7 @@ def json_decoder_security_info(arr):
     return result
 
 
-@bp.route('/<string:security>')
+@bp.route('/<string:security>', methods=['GET'])
 def get_security_info(security):
     url = 'http://iss.moex.com/iss/securities/{0}.json'.format(security)
     r = requests.get(url)
@@ -27,8 +27,6 @@ def get_security_info(security):
 
     if not info['description']['data']:
         return "empty", 204
-
-    # print(info['description']['data'])
     decoded_info = json_decoder_security_info(info['description']['data'])
     resp = make_response(
         jsonify({'security': decoded_info}), 200
@@ -48,7 +46,7 @@ def get_graph_info(candles):
     return result
 
     
-@bp.route('/<string:security>/<string:start_date>/<int:interval>')
+@bp.route('/<string:security>/<string:start_date>/<int:interval>', methods=['GET'])
 def get_candles(security, start_date, interval):
     try:
         dt = datetime.strptime(start_date, "%Y-%m-%d")
@@ -61,7 +59,6 @@ def get_candles(security, start_date, interval):
     r = requests.get(url)
     if r.status_code != 200:
         return "error", 400
-    
     candles = r.json()
     graph_info = get_graph_info(candles)
     resp = make_response(

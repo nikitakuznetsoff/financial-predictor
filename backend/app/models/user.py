@@ -2,8 +2,8 @@ from sqlalchemy import Column, String, Integer, DateTime
 from passlib.apps import custom_app_context as pwd_concept
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
-from app import Config
-from .base import Base
+from app.config import Config
+from app.models.base import Base
 
 
 class User(Base):
