@@ -1,1 +1,1 @@
-from .news import bp
+from .routes import bp

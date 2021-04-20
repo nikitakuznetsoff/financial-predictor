@@ -1,6 +1,6 @@
 <template>
   <div class="news mx-3">
-    <div class="columns">
+    <div class="columns mb-5">
       <div class="column is-1"/>
       <div class="column is-7">
         <section class="hero">
@@ -71,6 +71,7 @@
             </p>
           </div>
         </section>
+        <History></History>
       </div>
       <div class="column is-1"/>
     </div>
@@ -80,10 +81,14 @@
 <script>
 
 import axios from 'axios'
-import API_URL from '../common/config'
+import API_URL from '@/common/config'
+import History from '@/components/History.vue'
 
 export default {
-  name: 'Hone',
+  name: 'Home',
+  components: {
+    History
+  },
   methods: {
     toNewsItem: function(id) {
       this.$router.push('/news/'+id)

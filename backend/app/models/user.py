@@ -1,3 +1,4 @@
+import json
 from sqlalchemy import Column, String, Integer, DateTime
 from passlib.apps import custom_app_context as pwd_concept
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
@@ -23,6 +24,13 @@ class User(Base):
         s = Serializer(Config.SECRET_KEY, expires_in=expiration)
         return s.dumps({ 'id': self.id })
 
+    def get_dict_repr(self):
+        d = {
+            'id': self.id,
+            'email': self.email
+        }
+        return json.dumps(d)
+
     @staticmethod
     def verify_auth_token(token):
         s = Serializer(Config.SECRET_KEY)
@@ -33,6 +41,7 @@ class User(Base):
         except BadSignature:
             return None
         return data['id']
+
 
 
 

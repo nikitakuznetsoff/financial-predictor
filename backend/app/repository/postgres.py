@@ -12,7 +12,7 @@ class PostgresRepository:
         self.Session = Session
 
 
-    def create_user(self, id, password):
+    def create_user(self, email, password):
         user = None
         with self.Session() as session:
             user = User(email=email)

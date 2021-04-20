@@ -1,1 +1,1 @@
-from .security import bp
+from .routes import bp, get_candles
