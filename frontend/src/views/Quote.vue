@@ -67,10 +67,9 @@
                 </b-menu-list>
 
                 <b-menu-list label="Алгоритмы" icon="chart-areaspline">
-                  <b-menu-item label="ARIMA" icon="vector-line"></b-menu-item>
-                    <b-menu-item label="SARIMA" icon="vector-line"></b-menu-item>
-                    <b-menu-item label="Прочее" icon="vector-line"></b-menu-item>
-
+                  <b-menu-item label="ARIMA" icon="vector-line" @click="selectedAlgo = 'ARIMA'"></b-menu-item>
+                  <b-menu-item label="SARIMA" icon="vector-line" @click="selectedAlgo = 'SARIMA'"></b-menu-item>
+                  <b-menu-item label="Прочее" icon="vector-line" @click="selectedAlgo = 'OTHER'"></b-menu-item>
                 </b-menu-list>
                 <!-- <b-menu-list label="Actions">
                   <b-menu-item label="Logout"></b-menu-item>
@@ -79,7 +78,10 @@
             </div>
 
             <div class="column">
-              <Graph :tabIndex="period" :interval="interval"></Graph>
+              <Graph :tabIndex="period" 
+                :interval="interval"
+                :algo="selectedAlgo"
+              ></Graph>
             </div>
         
           <div class="column is-2">
@@ -112,8 +114,11 @@ export default {
       quote_is_empty: false,
       errored: false,
       error_text: null,
+
       period: 0,
       interval: 0,
+      selectedAlgo: 'ARIMA',
+
       columns: [
         {
           'field': 'title',

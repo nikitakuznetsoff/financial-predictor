@@ -20,6 +20,7 @@ export default {
   props: {
     interval: Number,
     tabIndex: Number,
+    algo: String
   },
   data() {
     return {
@@ -62,14 +63,20 @@ export default {
   },
   created() {
     this.getCandles();
+    this.getPrediction();
   },
   watch: {
     $route: 'getCandles',
     startDate: function() {
       this.getCandles();
+      this.getPrediction();
     },
     interval: function() {
       this.getCandles();
+      this.getPrediction();
+    },
+    algo: function() {
+      this.getPrediction();
     }
   },
   methods: {
@@ -98,6 +105,9 @@ export default {
       .finally(() => {
         this.loading = false;
       })
+    },
+    getPrediction() {
+      console.log("privet");
     },
     getInterval(value) {
       switch (value) {
