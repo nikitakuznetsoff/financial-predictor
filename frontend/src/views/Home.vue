@@ -1,8 +1,7 @@
 <template>
-  <div class="news mx-3">
-    <div class="columns mb-5">
-      <div class="column is-1"/>
-      <div class="column is-7">
+  <div>
+    <div class="columns mb-5 mx-6">
+      <div class="column is-8">
         <section class="hero">
           <div class="hero-body">
             <p class="title">
@@ -73,7 +72,6 @@
         </section>
         <History></History>
       </div>
-      <div class="column is-1"/>
     </div>
   </div>
 </template>

@@ -48,6 +48,7 @@ def get_graph_info(candles):
     
 @bp.route('/<string:security>/<string:start_date>/<int:interval>', methods=['GET'])
 def get_candles(security, start_date, interval):
+    print(start_date)
     try:
         dt = datetime.strptime(start_date, "%Y-%m-%d")
     except ValueError:

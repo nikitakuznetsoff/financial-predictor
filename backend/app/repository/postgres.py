@@ -19,7 +19,7 @@ class PostgresRepository:
             user.hash_password(password)
             try:
                 session.add(user)
-            except:
+            except Exception as e:
                 session.roolback()
                 raise
             else:
@@ -28,19 +28,15 @@ class PostgresRepository:
 
 
     def get_user_by_id(self, id):
-        result = None
-        with self.Sessions() as session:
-            stmt = select(User).filter_by(id=id)
-            result = session.execute(stmt).first()
-        return result
+        with self.Session() as session:
+            user = session.query(User).filter(User.id == id).first()
+        return user
 
 
     def get_user_by_email(self, email):
-        result = None
         with self.Session() as session:
-            stmt = select(User).filter_by(email=email)
-            result = session.execute(stmt).first()
-        return result
+            user = session.query(User).filter(User.email == email).first()
+        return user
 
     
     def create_task(self):

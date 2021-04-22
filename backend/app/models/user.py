@@ -1,6 +1,6 @@
 import json
 from sqlalchemy import Column, String, Integer, DateTime
-from passlib.apps import custom_app_context as pwd_concept
+from passlib.hash import pbkdf2_sha256
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
 from app.config import Config
@@ -15,14 +15,10 @@ class User(Base):
     password = Column(String)
 
     def hash_password(self, password):
-        self.password = pwd_concept.encrypt(password)
+        self.password = pbkdf2_sha256.encrypt(password)
 
     def verify_password(self, password):
-        return pwd_concept.verify(password, self.password)
-
-    def generate_auth_token(self, expiration=600):
-        s = Serializer(Config.SECRET_KEY, expires_in=expiration)
-        return s.dumps({ 'id': self.id })
+        return pbkdf2_sha256.verify(password, self.password)
 
     def get_dict_repr(self):
         d = {
@@ -30,6 +26,10 @@ class User(Base):
             'email': self.email
         }
         return json.dumps(d)
+
+    def generate_auth_token(self, expiration=600):
+        s = Serializer(Config.SECRET_KEY, expires_in=expiration)
+        return s.dumps({ 'id': self.id })
 
     @staticmethod
     def verify_auth_token(token):

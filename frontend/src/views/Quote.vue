@@ -1,53 +1,97 @@
 <template>
   <div class="quote mx-3 mb-3">
       <section class="hero">
-      <div class="hero-body">
-        <p class="title">
-          <b-skeleton size="is-large" :active="loading"></b-skeleton>
-          <section v-if="!loading">
-            <section v-if="quote_is_empty">
-              unknown quote
-            </section>
-            <section v-else>
-              {{ quote.LATNAME.value }}
-            </section>
+        <div class="hero-body">
+          <section v-if="loading">
+            <p class="title">
+              <b-skeleton size="is-large" :active="loading"></b-skeleton>
+            </p>
+            <p class="subtitle">
+              <b-skeleton size="is-small" :active="loading"></b-skeleton>
+            </p>
           </section>
-        </p>
-        <!-- <p class="desciption">
-            Group Name: {{ quote.GROUPNAME.value }}
-        </p> -->
-      </div>
-    </section>
-      <div class="columns">
-          <div class="column is-one-fifth">
-            <b-menu>
-              <b-menu-list label="Menu">
-                <b-menu-item icon="information-outline" label="Info"></b-menu-item>
-                <b-menu-item icon="account" label="My Account">
-                  <b-menu-item label="Account data"></b-menu-item>
-                  <b-menu-item label="Addresses"></b-menu-item>
-                </b-menu-item>
-              </b-menu-list>
-              <b-menu-list>
-                <b-menu-item label="Expo" icon="link" tag="router-link" target="_blank" to="/expo"></b-menu-item>
-              </b-menu-list>
-            </b-menu>    
-          </div>
-          <div class="column">
-            <div class="container">
-              <Graph></Graph>
+          <section v-else>
+            <p class="title">
+              <section v-if="quote_is_empty">
+                unknown quote
+              </section>
+              <section v-else>
+                {{ quote.LATNAME.value }}
+              </section>
+            </p>
+            <p class="subtitle" v-if="!quote_is_empty">
+              {{ $route.params.name }}
+            </p>
+          </section>
+          <!-- <p class="desciption">
+              Group Name: {{ quote.GROUPNAME.value }}
+          </p> -->
+        </div>
+      </section>
+            <b-tabs position="is-centered" 
+              type="is-toggle"
+            
+              class="block"
+              animated="false"
+              size="is-small"
+              v-model="period"
+            >
+              <b-tab-item label="1 день"></b-tab-item>
+              <b-tab-item label="1 неделя"></b-tab-item>
+              <b-tab-item label="1 месяц"></b-tab-item>
+              <b-tab-item label="3 месяца"></b-tab-item>
+              <b-tab-item label="6 месяцев"></b-tab-item>
+              <b-tab-item label="1 год"></b-tab-item>
+              <b-tab-item label="Макс"></b-tab-item>
+          </b-tabs>
+
+          <div class="columns">
+            <div class="column is-2">
+               <b-menu>
+                <b-menu-list label="Меню">
+                  <b-menu-item icon="information-outline" label="Информация"></b-menu-item>
+                  
+                  <b-menu-item icon="av-timer" :active="true" expanded>
+                    <template #label="props">
+                      Интервалы
+                      <b-icon class="is-pulled-right" :icon="props.expanded ? 'menu-down' : 'menu-up'"></b-icon>
+                    </template>
+                    <b-menu-item icon="arrow-right" label="1 мин" @click="interval = 1"></b-menu-item>
+                    <b-menu-item icon="arrow-right" label="4 мин" @click="interval = 4"></b-menu-item>
+                    <b-menu-item icon="arrow-right" label="7 мин" @click="interval = 7"></b-menu-item>
+                    <b-menu-item icon="arrow-right" label="10 мин" @click="interval = 10"></b-menu-item>
+                    <b-menu-item icon="arrow-right" label="24 мин" @click="interval = 24"></b-menu-item>
+                    <b-menu-item icon="arrow-right" label="31 мин" @click="interval = 31"></b-menu-item>
+                    <b-menu-item icon="arrow-right" label="1 час" @click="interval = 60"></b-menu-item>
+                  </b-menu-item>
+                </b-menu-list>
+
+                <b-menu-list label="Алгоритмы" icon="chart-areaspline">
+                  <b-menu-item label="ARIMA" icon="vector-line"></b-menu-item>
+                    <b-menu-item label="SARIMA" icon="vector-line"></b-menu-item>
+                    <b-menu-item label="Прочее" icon="vector-line"></b-menu-item>
+
+                </b-menu-list>
+                <!-- <b-menu-list label="Actions">
+                  <b-menu-item label="Logout"></b-menu-item>
+                </b-menu-list> -->
+              </b-menu> 
             </div>
-          </div>
-          <div class="column is-one-quarter">
+
+            <div class="column">
+              <Graph :tabIndex="period" :interval="interval"></Graph>
+            </div>
+        
+          <div class="column is-2">
             <b-skeleton size="is-large" :active="loading"></b-skeleton>
             <div class="card" v-if="!loading">
-              <div class="card-content">
+              <div class="card-content is-size-7">
                 <b-table :data="quote" :columns="columns">
                 </b-table>
               </div>
             </div>
           </div>
-      </div>
+        </div>
   </div>
 </template>
 
@@ -68,6 +112,8 @@ export default {
       quote_is_empty: false,
       errored: false,
       error_text: null,
+      period: 0,
+      interval: 0,
       columns: [
         {
           'field': 'title',
@@ -77,7 +123,7 @@ export default {
           'field': 'value',
           'label': 'Name'
         },
-      ]
+      ],
     }
   },
   created() {
@@ -108,7 +154,7 @@ export default {
       .finally(() => {
         this.loading = false
       });
-    }
+    },
   }
 }
 </script>

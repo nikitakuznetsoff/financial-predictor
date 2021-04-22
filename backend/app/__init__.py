@@ -1,2 +1,1 @@
-from .app import application, repo
-from .config import Config
+from .app import application

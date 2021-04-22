@@ -25,10 +25,7 @@
                 <b-checkbox>Remember me</b-checkbox>
             </section>
             <footer class="modal-card-foot">
-                <b-button
-                    label="Login"
-                    class="is-primary"
-                    type="sublmit" />
+                <input type="submit" class="button is-primary" value="Login">
             </footer>
         </div>
     </form>
@@ -46,10 +43,17 @@ export default {
     },
     methods: {
         login() {
-            console.log("hello");
-            // let email = this.email;
-            // let pass = this.password;
-
+            let email = this.email;
+            let password = this.password;
+            this.$store.dispatch('login', { email, password })
+            .then(() => this.$router.push('/'))
+            .catch(err => {
+                console.log(err);
+                this.$buefy.toast.open({
+                    type: 'is-danger',
+                    message: err.response.data
+                });
+            })
         }
     }
 }
