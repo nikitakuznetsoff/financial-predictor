@@ -2,6 +2,7 @@
   <div class="graph">
     <b-skeleton size="is-large" v-if="loading" :animated="true"></b-skeleton>
     <section class v-if="!loading">
+        <!-- start date: {{ startDate }} -->
         <apexchart type="candlestick" :options="chartOptions" :series="candles"></apexchart>
     </section>
     
@@ -89,7 +90,7 @@ export default {
       var interval = this.interval;
 
       // response structure http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/57/securities/AFLT/candles.json?from=2021-04-13&interval=10
-      axios.get(API_URL+'/security/'+this.$route.params.name+'/'+startDate+'/'+interval)
+      axios.get(API_URL+'/security/'+this.$route.params.name+'/candles?from='+startDate+'&interval='+interval)
       .then(response => {
         if (response.status != 200) {
           this.candles_is_empty = true;

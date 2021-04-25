@@ -32,17 +32,17 @@
               type="is-toggle"
             
               class="block"
-              animated="false"
+              animated="False"
               size="is-small"
               v-model="period"
             >
-              <b-tab-item label="1 день"></b-tab-item>
-              <b-tab-item label="1 неделя"></b-tab-item>
-              <b-tab-item label="1 месяц"></b-tab-item>
-              <b-tab-item label="3 месяца"></b-tab-item>
-              <b-tab-item label="6 месяцев"></b-tab-item>
-              <b-tab-item label="1 год"></b-tab-item>
-              <b-tab-item label="Макс"></b-tab-item>
+              <b-tab-item label="1 день" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="1 неделя" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="1 месяц" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="3 месяца" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="6 месяцев" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="1 год" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="Макс" @click="changeIntervalStatus"></b-tab-item>
           </b-tabs>
 
           <div class="columns">
@@ -56,13 +56,41 @@
                       Интервалы
                       <b-icon class="is-pulled-right" :icon="props.expanded ? 'menu-down' : 'menu-up'"></b-icon>
                     </template>
-                    <b-menu-item icon="arrow-right" label="1 мин" @click="interval = 1"></b-menu-item>
-                    <b-menu-item icon="arrow-right" label="4 мин" @click="interval = 4"></b-menu-item>
-                    <b-menu-item icon="arrow-right" label="7 мин" @click="interval = 7"></b-menu-item>
-                    <b-menu-item icon="arrow-right" label="10 мин" @click="interval = 10"></b-menu-item>
-                    <b-menu-item icon="arrow-right" label="24 мин" @click="interval = 24"></b-menu-item>
-                    <b-menu-item icon="arrow-right" label="31 мин" @click="interval = 31"></b-menu-item>
-                    <b-menu-item icon="arrow-right" label="1 час" @click="interval = 60"></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="1 мин" 
+                      @click="interval = 1"
+                      :disabled="isIntervalAvailable(1)"
+                    ></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="10 мин" 
+                      @click="interval = 10"
+                      :disabled="isIntervalAvailable(10)"
+                    ></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="1 час" 
+                      @click="interval = 60"
+                      :disabled="isIntervalAvailable(60)" 
+                    ></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="1 день" 
+                      @click="interval = 24"
+                      :disabled="isIntervalAvailable(24)" 
+                    ></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="1 неделя" 
+                      @click="interval = 7"
+                      :disabled="isIntervalAvailable(7)" 
+                    ></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="1 месяц" 
+                      @click="interval = 31"
+                      :disabled="isIntervalAvailable(31)" 
+                    ></b-menu-item>
+                    <b-menu-item icon="arrow-right" 
+                      label="3 месяца" 
+                      @click="interval = 4" 
+                      :disabled="isIntervalAvailable(4)"
+                    ></b-menu-item>
                   </b-menu-item>
                 </b-menu-list>
 
@@ -71,9 +99,6 @@
                   <b-menu-item label="SARIMA" icon="vector-line" @click="selectedAlgo = 'SARIMA'"></b-menu-item>
                   <b-menu-item label="Прочее" icon="vector-line" @click="selectedAlgo = 'OTHER'"></b-menu-item>
                 </b-menu-list>
-                <!-- <b-menu-list label="Actions">
-                  <b-menu-item label="Logout"></b-menu-item>
-                </b-menu-list> -->
               </b-menu> 
             </div>
 
@@ -116,8 +141,16 @@ export default {
       error_text: null,
 
       period: 0,
-      interval: 0,
+      interval: 1,
       selectedAlgo: 'ARIMA',
+
+      is_1_min: null,
+      is_10_min: null, 
+      is_1_hour: null,
+      is_1_day: null,
+      is_1_week: null,
+      is_1_month: null,
+      is_3_month: null,
 
       columns: [
         {
@@ -160,6 +193,83 @@ export default {
         this.loading = false
       });
     },
-  }
+    isIntervalAvailable(interval) {
+      let intervals = [1, 10, 60, 24, 7, 31, 4];
+      let interval_slice = null;
+      // console.log(this.period);
+      // console.log(this.interval);
+      switch(this.period) {
+        case 0:
+          interval_slice = intervals.slice(0, 3);
+          break;
+        case 1:
+          interval_slice = intervals.slice(2, 4)
+          break;
+        case 2:
+          interval_slice = intervals.slice(2, 6)
+          break;
+        case 3:
+          interval_slice = intervals.slice(3, 7)
+          break;
+        case 4:
+          interval_slice = intervals.slice(3, 7)
+          break;
+        case 5:
+          interval_slice = intervals.slice(3, 7)
+          break;
+        case 6:
+          interval_slice = intervals.slice(5, 7)
+          break;
+      }
+      if (interval_slice.includes(interval)) {
+        return null
+      } else {
+        return 'disabled'
+      }
+    },
+    changeIntervalStatus() {
+      // let intervals = [1, 10, 60, 24, 7, 31, 4];
+      // let interval_slice = null;
+      // console.log(this.period);
+      // console.log(this.interval);
+      switch(this.period) {
+        case 0:
+          this.is_1_min = this.is_10_min = null;
+          this.is_1_hour = this.is_1_day = this.is_1_week = this.is_1_month = this.is_3_month = '';
+          // interval_slice = intervals.slice(0, 3);
+          break;
+        case 1:
+          this.is_1_hour = this.is_1_day = null;
+          this.is_1_min = this.is_10_min = this.is_1_week = this.is_1_month = this.is_3_month = '';
+          // interval_slice = intervals.slice(2, 4)
+          break;
+        case 2:
+          this.is_1_day = this.is_1_week = this.is_1_month = null;
+          this.is_1_min = this.is_10_min = this.is_1_hour = this.is_3_month = '';
+          // interval_slice = intervals.slice(3, 6)
+          break;
+        case 3:
+          this.is_1_week = this.is_1_month = this.is_3_month = null;
+          this.is_1_min = this.is_10_min = this.is_1_hour = '';
+          // interval_slice = intervals.slice(4, 7)
+          break;
+        case 4:
+          this.is_1_week = this.is_1_month = this.is_3_month = null;
+          this.is_1_min = this.is_10_min = this.is_1_hour = '';
+          // interval_slice = intervals.slice(4, 7)
+          break;
+        case 5:
+          this.is_1_week = this.is_1_month = this.is_3_month = null;
+          this.is_1_min = this.is_10_min = this.is_1_hour = '';
+          // interval_slice = intervals.slice(4, 7)
+          break;
+        case 6:
+          this.is_1_month = this.is_3_month = null;
+          this.is_1_min = this.is_10_min = this.is_1_hour = this.is_1_week = '';
+          // interval_slice = intervals.slice(5, 7)
+          break;
+      }
+    }
+  },
 }
 </script>
