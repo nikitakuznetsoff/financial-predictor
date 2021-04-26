@@ -36,13 +36,13 @@
               size="is-small"
               v-model="period"
             >
-              <b-tab-item label="1 день" @click="changeIntervalStatus"></b-tab-item>
-              <b-tab-item label="1 неделя" @click="changeIntervalStatus"></b-tab-item>
-              <b-tab-item label="1 месяц" @click="changeIntervalStatus"></b-tab-item>
-              <b-tab-item label="3 месяца" @click="changeIntervalStatus"></b-tab-item>
-              <b-tab-item label="6 месяцев" @click="changeIntervalStatus"></b-tab-item>
-              <b-tab-item label="1 год" @click="changeIntervalStatus"></b-tab-item>
-              <b-tab-item label="Макс" @click="changeIntervalStatus"></b-tab-item>
+              <b-tab-item label="1 день"></b-tab-item>
+              <b-tab-item label="1 неделя"></b-tab-item>
+              <b-tab-item label="1 месяц"></b-tab-item>
+              <b-tab-item label="3 месяца"></b-tab-item>
+              <b-tab-item label="6 месяцев"></b-tab-item>
+              <b-tab-item label="1 год"></b-tab-item>
+              <b-tab-item label="Макс"></b-tab-item>
           </b-tabs>
 
           <div class="columns">
@@ -95,9 +95,21 @@
                 </b-menu-list>
 
                 <b-menu-list label="Алгоритмы" icon="chart-areaspline">
-                  <b-menu-item label="ARIMA" icon="vector-line" @click="selectedAlgo = 'ARIMA'"></b-menu-item>
-                  <b-menu-item label="SARIMA" icon="vector-line" @click="selectedAlgo = 'SARIMA'"></b-menu-item>
-                  <b-menu-item label="Прочее" icon="vector-line" @click="selectedAlgo = 'OTHER'"></b-menu-item>
+                  <b-menu-item label="MA" 
+                    icon="vector-line" 
+                    @click="selectedAlgo = 'ma'"></b-menu-item>
+                  <b-menu-item label="ARMA" 
+                    icon="vector-line" 
+                    @click="selectedAlgo = 'arma'"></b-menu-item>
+                  <b-menu-item label="ARIMA" 
+                    icon="vector-line" 
+                    @click="selectedAlgo = 'arima'"></b-menu-item>
+                  <b-menu-item label="SARIMA" 
+                    icon="vector-line" 
+                    @click="selectedAlgo = 'sarima'"></b-menu-item>
+                  <!-- <b-menu-item label="Прочее" 
+                    icon="vector-line" 
+                    @click="selectedAlgo = 'OTHER'"></b-menu-item> -->
                 </b-menu-list>
               </b-menu> 
             </div>
@@ -144,14 +156,6 @@ export default {
       interval: 1,
       selectedAlgo: 'ARIMA',
 
-      is_1_min: null,
-      is_10_min: null, 
-      is_1_hour: null,
-      is_1_day: null,
-      is_1_week: null,
-      is_1_month: null,
-      is_3_month: null,
-
       columns: [
         {
           'field': 'title',
@@ -196,8 +200,6 @@ export default {
     isIntervalAvailable(interval) {
       let intervals = [1, 10, 60, 24, 7, 31, 4];
       let interval_slice = null;
-      // console.log(this.period);
-      // console.log(this.interval);
       switch(this.period) {
         case 0:
           interval_slice = intervals.slice(0, 3);
@@ -227,49 +229,6 @@ export default {
         return 'disabled'
       }
     },
-    changeIntervalStatus() {
-      // let intervals = [1, 10, 60, 24, 7, 31, 4];
-      // let interval_slice = null;
-      // console.log(this.period);
-      // console.log(this.interval);
-      switch(this.period) {
-        case 0:
-          this.is_1_min = this.is_10_min = null;
-          this.is_1_hour = this.is_1_day = this.is_1_week = this.is_1_month = this.is_3_month = '';
-          // interval_slice = intervals.slice(0, 3);
-          break;
-        case 1:
-          this.is_1_hour = this.is_1_day = null;
-          this.is_1_min = this.is_10_min = this.is_1_week = this.is_1_month = this.is_3_month = '';
-          // interval_slice = intervals.slice(2, 4)
-          break;
-        case 2:
-          this.is_1_day = this.is_1_week = this.is_1_month = null;
-          this.is_1_min = this.is_10_min = this.is_1_hour = this.is_3_month = '';
-          // interval_slice = intervals.slice(3, 6)
-          break;
-        case 3:
-          this.is_1_week = this.is_1_month = this.is_3_month = null;
-          this.is_1_min = this.is_10_min = this.is_1_hour = '';
-          // interval_slice = intervals.slice(4, 7)
-          break;
-        case 4:
-          this.is_1_week = this.is_1_month = this.is_3_month = null;
-          this.is_1_min = this.is_10_min = this.is_1_hour = '';
-          // interval_slice = intervals.slice(4, 7)
-          break;
-        case 5:
-          this.is_1_week = this.is_1_month = this.is_3_month = null;
-          this.is_1_min = this.is_10_min = this.is_1_hour = '';
-          // interval_slice = intervals.slice(4, 7)
-          break;
-        case 6:
-          this.is_1_month = this.is_3_month = null;
-          this.is_1_min = this.is_10_min = this.is_1_hour = this.is_1_week = '';
-          // interval_slice = intervals.slice(5, 7)
-          break;
-      }
-    }
   },
 }
 </script>

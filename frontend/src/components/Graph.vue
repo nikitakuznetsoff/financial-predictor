@@ -35,9 +35,43 @@ export default {
         chart: {
           type: 'candlestick',
         },
-        title: {
-          text: 'График',
-          align: 'left'
+        animations: {
+          enabled: true,
+          speed: 2000,
+        },
+        annotations: {
+          xaxis: [
+            {
+              x: '2021-04-23 23:00:00',
+              borderColor: '#FF6B6B',
+              label: {
+                borderColor: '#FF6B6B',
+                style: {
+                  fontSize: '13px',
+                  color: '#fff',
+                  background: '#FF6B6B'
+                },
+                orientation: 'vertical',
+                // offsetY: 7,
+                text: 'Это прогноз стоимости мудила'
+              }
+            }
+          ],
+          points: [
+            {
+              x: '2021-04-23 23:00:00',
+              y: 65,
+              borderColor: '#FF4560',
+              marker: {
+                size: 8,
+              },
+              label: {
+                borderColor: '#FF4560',
+                text: 'Прогноз стоимости',
+                orientation: 'vertical',
+              }
+            }
+          ]
         },
         xaxis: {
           type: 'category',
@@ -47,8 +81,22 @@ export default {
           tooltip: {
             enabled: true
           }
-        }
+        },
       },
+      annotations: {
+          xaxis: [
+            {
+              x: new Date('2021-04-24').getTime(),
+              borderColor: '#775DD0',
+              label: {
+                style: {
+                  color: '#fff',
+                },
+                text: 'X-axis annotation - 22 Nov'
+              }
+            }
+          ]
+        },
       intervals: {
         'day': 1000 * 60 * 60 * 24,
         'week': 1000 * 60 * 60 * 24 * 7,
@@ -108,7 +156,15 @@ export default {
       })
     },
     getPrediction() {
-      console.log("privet");
+      let algo = this.algo;
+      // let candles = this.candles.data;
+      axios.post(API_URL+'/tasks/'+algo, this.candles[0])
+      .then(resp => {
+        console.log(resp);
+      })
+      .catch(err => {
+        console.log(err);
+      })
     },
     getInterval(value) {
       switch (value) {

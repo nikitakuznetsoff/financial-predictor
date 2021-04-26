@@ -97,7 +97,7 @@ export default {
       news: [],
       loading: true,
       errored: false,
-      error_text: null
+      error_text: null,
     }
   },
   mounted() {
