@@ -27,7 +27,7 @@ class User(Base):
         }
         return json.dumps(d)
 
-    def generate_auth_token(self, expiration=600):
+    def generate_auth_token(self, expiration=6000):
         s = Serializer(Config.SECRET_KEY, expires_in=expiration)
         return s.dumps({ 'id': self.id })
 

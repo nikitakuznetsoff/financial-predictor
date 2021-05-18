@@ -25,6 +25,14 @@ export default {
         throw err;
       })
     })
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler(to) {
+        document.title = to.meta.title || 'Financial Predictor'
+      }
+    }
   }
 }
 </script>

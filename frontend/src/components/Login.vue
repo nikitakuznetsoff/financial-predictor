@@ -3,29 +3,29 @@
     <form class="login" @submit.prevent="login">
         <div class="modal-card" style="width:300px;">
             <section class="modal-card-body">
-                <b-field label="Email">
+                <b-field label="Электронная почта">
                     <b-input
                         type="email"
-                        placeholder="Your email"
+                        placeholder="Введите адрес"
                         v-model="email"
                         required>
                     </b-input>
                 </b-field>
 
-                <b-field label="Password">
+                <b-field label="Пароль">
                     <b-input
                         type="password"
                         password-reveal
-                        placeholder="Your password"
+                        placeholder="Введите пароль"
                         v-model="password"
                         required>
                     </b-input>
                 </b-field>
 
-                <b-checkbox>Remember me</b-checkbox>
+                <b-checkbox>Запомнить меня</b-checkbox>
             </section>
             <footer class="modal-card-foot">
-                <input type="submit" class="button is-primary" value="Login">
+                <input type="submit" class="button is-primary" value="Войти">
             </footer>
         </div>
     </form>

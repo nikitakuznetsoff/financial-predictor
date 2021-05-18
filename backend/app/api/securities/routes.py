@@ -2,6 +2,8 @@ from flask import Blueprint, make_response, jsonify, request
 import datetime
 import requests
 
+from app.repository import securities_repo as repo
+
 bp = Blueprint('security', __name__, url_prefix='/api/security')
 
 @bp.route('', methods=['GET'])
@@ -97,6 +99,10 @@ def get_candles(security):
     data = r.json()
     columns = data['candles']['columns']
     candles.extend(data['candles']['data'])
+
+    # print(repo.get_candles(
+    #     security_id=security, interval=interval, start_date=start_date_dt
+    # ))
 
     # Если количество полученных свечей меньше нужного количества, 
     # значит нужно сделать еще некоторое кол-во запросов для получения остальных данных

@@ -3,3 +3,5 @@ sqlalchemy
 itsdangerous
 passlib
 requests
+dnspython
+motor

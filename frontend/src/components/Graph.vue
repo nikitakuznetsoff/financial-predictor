@@ -1,9 +1,14 @@
 <template>
-  <div class="graph">
-    <b-skeleton size="is-large" v-if="loading" :animated="true"></b-skeleton>
+  <div class="graph ml-3">
+    <b-skeleton 
+      size="is-large" 
+      v-if="loading" 
+      :animated="true"
+      :height="500"
+    ></b-skeleton>
     <section class v-if="!loading">
         <!-- start date: {{ startDate }} -->
-        <apexchart type="candlestick" :options="chartOptions" :series="candles"></apexchart>
+        <apexchart type="candlestick" :options="chartOptions" :series="candles" height="600"></apexchart>
     </section>
     
   </div>
@@ -41,36 +46,8 @@ export default {
         },
         annotations: {
           xaxis: [
-            {
-              x: '2021-04-23 23:00:00',
-              borderColor: '#FF6B6B',
-              label: {
-                borderColor: '#FF6B6B',
-                style: {
-                  fontSize: '13px',
-                  color: '#fff',
-                  background: '#FF6B6B'
-                },
-                orientation: 'vertical',
-                // offsetY: 7,
-                text: 'Это прогноз стоимости мудила'
-              }
-            }
           ],
           points: [
-            {
-              x: '2021-04-23 23:00:00',
-              y: 65,
-              borderColor: '#FF4560',
-              marker: {
-                size: 8,
-              },
-              label: {
-                borderColor: '#FF4560',
-                text: 'Прогноз стоимости',
-                orientation: 'vertical',
-              }
-            }
           ]
         },
         xaxis: {
@@ -83,20 +60,6 @@ export default {
           }
         },
       },
-      annotations: {
-          xaxis: [
-            {
-              x: new Date('2021-04-24').getTime(),
-              borderColor: '#775DD0',
-              label: {
-                style: {
-                  color: '#fff',
-                },
-                text: 'X-axis annotation - 22 Nov'
-              }
-            }
-          ]
-        },
       intervals: {
         'day': 1000 * 60 * 60 * 24,
         'week': 1000 * 60 * 60 * 24 * 7,
@@ -111,8 +74,8 @@ export default {
     }
   },
   created() {
-    this.getCandles();
-    this.getPrediction();
+    // this.getCandles();
+    // this.getPrediction();
   },
   watch: {
     $route: 'getCandles',
@@ -125,6 +88,9 @@ export default {
       this.getPrediction();
     },
     algo: function() {
+      this.candles[0]['data'].pop();
+      this.chartOptions.annotations.points.pop();
+      this.chartOptions.annotations.xaxis.pop();
       this.getPrediction();
     }
   },
@@ -144,6 +110,7 @@ export default {
           this.candles_is_empty = true;
         } else {
           this.candles = [ response.data ];
+          // console.log(this.candles[0][0])
         }
       })
       .catch(e => {
@@ -156,14 +123,58 @@ export default {
       })
     },
     getPrediction() {
+      this.loading = true;
       let algo = this.algo;
-      // let candles = this.candles.data;
       axios.post(API_URL+'/tasks/'+algo, this.candles[0])
       .then(resp => {
         console.log(resp);
+        let info = resp.data;
+        // let point = {
+        //   x: '2021-04-26 18:00:00',
+        //   y: 50
+        // }
+        let candle = {
+          x: info['date'],
+          y: [info['prediction'], info['prediction'], info['prediction'], info['prediction']]
+        }
+        this.candles[0]['data'].push(candle);
+        let p = {
+              x: info['date'],
+              y: info['prediction'],
+              borderColor: '#FF4560',
+              marker: {
+                size: 8,
+              },
+              label: {
+                borderColor: '#FF4560',
+                text: 'Прогноз',
+                orientation: 'vertical',
+              }
+            }
+
+        let xas = {
+              x: info['date'],
+              borderColor: '#FF6B6B',
+              // label: {
+              //   borderColor: '#FF6B6B',
+              //   style: {
+              //     fontSize: '13px',
+              //     color: '#fff',
+              //     background: '#FF6B6B'
+              //   },
+              //   orientation: 'vertical',
+              //   // offsetY: 7,
+              //   text: 'Это прогноз стоимости мудила'
+              // }
+            }
+        this.chartOptions.annotations.points.push(p);
+        this.chartOptions.annotations.xaxis.push(xas);
       })
       .catch(err => {
         console.log(err);
+      })
+      .finally(() => {
+        this.loading = false;
       })
     },
     getInterval(value) {

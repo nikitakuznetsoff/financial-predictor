@@ -1,7 +1,13 @@
 <template>
     <div class="footer">
-        <div class="content has-text-centered">
-            <p><strong>Financial Predictor</strong> by Nikita Kuznetsov</p>
+        <div class="content mx-6">
+            <p>
+              <b-icon
+                icon="copyright"
+                size="is-small">
+              </b-icon>
+              <strong> 2021 Financial Predictor</strong>
+            </p>
         </div>
     </div>
 </template>

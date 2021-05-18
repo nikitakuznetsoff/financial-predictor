@@ -1,7 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify
 
-from app.repository import repo
 from app.models import User
+from app.repository import users_repo as repo
 
 bp = Blueprint('users', __name__, url_prefix='/api/users')
 

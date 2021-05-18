@@ -4,7 +4,7 @@
             <div class="conteiner has-text-centered">
                 <div class="hero-body">
                     <p class="title">
-                    Registration
+                    Регистрация
                     </p>
                 </div>
             </div>
@@ -20,34 +20,34 @@
                         </b-field> -->
                         <!-- type="is-danger"
                         message="This email is invalid" -->
-                        <b-field label="Email">
+                        <b-field label="Электронная почта">
                             <b-input type="email"
                                 maxlength="30"
-                                placeholder="email"
+                                placeholder="почта"
                                 v-model="email"
                             >
                             </b-input>
                         </b-field>
                         <!-- type="is-warning"
                         :message="['Password is too short', 'Password must have at least 8 characters']" -->
-                        <b-field label="Password">
+                        <b-field label="Пароль">
                             <b-input type="password" 
                                 maxlength="30"
-                                placeholder="password"
+                                placeholder="пароль"
                                 v-model="password"
                             ></b-input>
                         </b-field>
-                        <b-field label="Confirm password"
+                        <b-field label="Подтвеждение пароля"
                             v-bind:type="label_type"
                             v-bind:message="label_text"
                         >
                             <b-input type="password" 
                                 maxlength="30"
-                                placeholder="confirm password"
+                                placeholder="подтверждение пароля"
                                 v-model="password_confirmation"
                             ></b-input>
                         </b-field>
-                        <input class="button is-primary" type="submit" value="Register">
+                        <input class="button is-primary" type="submit" value="Зарегистрироваться">
                     </section>
                 </form>
    

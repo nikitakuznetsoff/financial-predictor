@@ -2,7 +2,7 @@ from flask import Blueprint, request, make_response, jsonify
 from flask_httpauth import HTTPBasicAuth
 
 from app.models import User
-from app.repository import repo
+from app.repository import users_repo as repo
 
 
 bp = Blueprint('login', __name__, url_prefix='/api/login')
