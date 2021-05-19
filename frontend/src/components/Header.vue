@@ -16,20 +16,39 @@
               icon="magnify"
               icon-clickable
               v-model="search"
-              @focus="dropdownMenuStatus = true"
-              @blur="dropdownMenuStatus = false"
+              @focus="focusedInput()"
+              @blur="dropdownMenuStatus = false; isLoading=true"
           >
           </b-input>
         </form> 
         <div class="box" :style="dropdownMenuStyle">
           <div class="content">
-            <h3>
-                Поиск
-            </h3>
-            <b-loading :is-full-page="false" v-model="isLoading" :can-cancel="true"></b-loading>
-            <p>
-              {{ search }}
-            </p>
+            <section v-if="isLoading">
+              <div class="m-6">
+              <b-loading 
+                :is-full-page="false" 
+                v-model="isLoading" 
+                :can-cancel="true"
+              ></b-loading>
+            </div>
+            </section>
+            <section v-else>
+              <b-table
+                :data="findedInstruments"
+                narrowed
+              >
+                <b-table-column field="id" v-slot="props">
+                  {{ props.row.id }}
+                </b-table-column>
+                <b-table-column field="name" v-slot="props">
+                  {{ props.row.name }}
+                </b-table-column>
+                <b-table-column field="type" v-slot="props">
+                  {{ props.row.type }}
+                </b-table-column>
+
+              </b-table>
+            </section>
           </div>
         </div>
       </div>
@@ -114,18 +133,53 @@ export default {
       authStatus: '',
       dropdownMenuStatus: false,
       isLoading: true,
+      knownInstruments: [
+        {
+          id: 'AFLT',
+          name: 'Aeroflot',
+          type: 'Акции'
+        },
+        {
+          id: 'GAZP',
+          name: 'Gazprom',
+          type: 'Акции'
+        },
+        {
+          id: 'AAPL',
+          name: 'Apple',
+          type: 'Акции'
+        }
+      ],
+      findedInstruments: null,
+      columns: [
+        { field: 'id' },
+        { field: 'name' },
+        { field: 'type' }
+      ]
     } 
   },
   computed: {
     dropdownMenuStyle: function() {
       if (this.dropdownMenuStatus == true) {
-        return "display: flex; position: absolute;"
+        return "display: flex; position: absolute; min-width: 250px; min-height: 25px"
       } else {
         return "display: none"
       }
     }
   }, 
   methods: {
+    focusedInput() {
+      this.dropdownMenuStatus = true;
+      if (this.search != '') {
+        this.changedSearch();
+      } else {
+        this.isLoading=true;
+      }
+    },
+    changedSearch() {
+      this.findedInstruments = this.knownInstruments;
+      this.isLoading = false;
+    },
     onSubmit() {
       this.$router.push({ name: 'QuoteForecast', params: { name: this.search }})
     },
@@ -143,7 +197,8 @@ export default {
     this.changedAuthStatus();
   },
   watch: {
-    $store: 'changedAuthStatus'
+    $store: 'changedAuthStatus',
+    search: 'changedSearch'
   }
 }
 </script>

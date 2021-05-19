@@ -7,8 +7,8 @@
             </ul>
         </div>
 
-        <div class="box px-6">
-            <div class="card-content is-size-7">
+        <div class="container box mb-6">
+            <div class="card-content">
                 <section v-if="loading">
                     <b-skeleton size="is-large" :active="loading"></b-skeleton>
                 </section>

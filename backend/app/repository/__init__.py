@@ -5,9 +5,11 @@ from pymongo import MongoClient
 
 from .postgres import PostgresRepository
 from .mongo import MongoRepository
+# from app.config import Config
+# from app.models import Base
+
 from app.config import Config
 from app.models import Base
-
 
 conf = Config()
 POSTGRES_DSN = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
@@ -25,10 +27,11 @@ users_repo = PostgresRepository()
 users_repo.set_session(Session)
 
 
-MONGO_DSN = 'mongodb://{0}:{1}@{2}/{3}'.format(
+MONGO_DSN = 'mongodb://{0}:{1}@{2}:{3}/{4}'.format(
     conf.MONGO_USERNAME,
     conf.MONGO_PASSWORD,
     conf.MONGO_HOST,
+    conf.MONGO_PORT,
     conf.MONGO_DBNAME
 )
 mongo_client = MongoClient(MONGO_DSN)

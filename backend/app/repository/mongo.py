@@ -1,8 +1,8 @@
 import asyncio
 import aiohttp
 import json
-import datetime
 import requests
+from datetime import datetime
 
 
 class MongoRepository:
@@ -66,7 +66,7 @@ class MongoRepository:
         return description
     
     def _get_number_of_required_candles(self, interval, start_date):
-            gap = datetime.datetime.now() - start_date
+            gap = datetime.now() - start_date
             gap_in_minutes = gap.days * 24 * 60
             number_of_candles = int(gap_in_minutes / interval)
             return number_of_candles
@@ -104,12 +104,13 @@ class MongoRepository:
     #         # Получить инфу от moex
     #         candles = self._get_candles_from_moex(security_id, interval, start_date)
     #     return candles    
+
     def get_candles(self, security_id, interval, start_date):
         total_number_of_candles = self._get_number_of_required_candles(interval, start_date)
-        candles = self.client.finpred.candles.find({
+        candles = self.client.finPredictor.candles.find({
             "index": security_id,
             "interval": interval,
-            "start_date": { "$gte": { start_date } }
+            "start_date": { "$gte": start_date }
         })
         if candles.count() < total_number_of_candles:
             URL = 'http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/'+\

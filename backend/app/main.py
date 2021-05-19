@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
 
+# from api.news import news_blueprint
+
 from app.api.news import news_blueprint
 from app.api.securities import securities_blueprint
 from app.api.users import login_blueprint, users_blueprint

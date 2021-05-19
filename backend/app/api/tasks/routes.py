@@ -7,6 +7,7 @@ from app.repository import users_repo as repo
 
 bp = Blueprint('tasks', __name__, url_prefix='/api/tasks')
 
+
 @bp.route('', methods=['GET'])
 def tasks():
     return 'pong', 200

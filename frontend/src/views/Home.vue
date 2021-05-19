@@ -1,6 +1,6 @@
 <template>
   <div :style="style">
-    <div class="columns pb-6 px-6">
+    <div class="columns pb-6 px-6 is-variable is-6">
       <div class="column is-9">
         <section class="section">
           <p class="title">
@@ -12,102 +12,109 @@
               {{ error_text }}
             </p>
           </section>
-          <div class="tile is-ancestor">
-            <a class="tile is-parent is-8" @click="toNewsItem(news[0].id)">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large" :active="loading"></b-skeleton>
-                <b-skeleton size="is-small" :active="loading"></b-skeleton>
-                <p class="title is-6" v-if="!loading">{{ news[0].title }}</p>
-                <p class="subtitle is-6" v-if="!loading">{{ news[0].published_at }}</p>
-              </article>
-            </a>
-
-            <a class="tile is-parent" @click="toNewsItem(news[1].id)">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large" :active="loading"></b-skeleton>
-                <b-skeleton size="is-small" :active="loading"></b-skeleton>
-                <p class="title is-6" v-if="!loading">{{ news[1].title }}</p>
-                <p class="subtitle is-6" v-if="!loading">{{ news[1].published_at }}</p>
-              </article>
-            </a>
-          </div>
-            
-          <div class="tile is-ancestor">
-            <a class="tile is-parent" @click="toNewsItem(news[2].id)">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large" :active="loading"></b-skeleton>
-                <b-skeleton size="is-small" :active="loading"></b-skeleton>
-                <p class="title is-6" v-if="!loading">{{ news[2].title }}</p>
-                <p class="subtitle is-6" v-if="!loading">{{ news[2].published_at }}</p>
-              </article>
-            </a>
-            <a class="tile is-parent" @click="toNewsItem(news[3].id)">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large" :active="loading"></b-skeleton>
-                <b-skeleton size="is-small" :active="loading"></b-skeleton>
-                <p class="title is-6" v-if="!loading">{{ news[3].title }}</p>
-                <p class="subtitle is-6" v-if="!loading">{{ news[3].published_at }}</p>
-              </article>
-            </a>
-            <a class="tile is-parent" @click="toNewsItem(news[4].id)">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large" :active="loading"></b-skeleton>
-                <b-skeleton size="is-small" :active="loading"></b-skeleton>
-                <p class="title is-6" v-if="!loading">{{ news[4].title }}</p>
-                <p class="subtitle is-6" v-if="!loading">{{ news[4].published_at }}</p>
-              </article>
-            </a>
-          </div>
         </section>
+
+        <div class="tile is-ancestor">
+          <a class="tile is-parent is-8" @click="toNewsItem(news[0].id)">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :active="loading"></b-skeleton>
+              <b-skeleton size="is-small" :active="loading"></b-skeleton>
+              <p class="title is-6" v-if="!loading">{{ news[0].title }}</p>
+              <p class="subtitle is-6" v-if="!loading">{{ news[0].published_at }}</p>
+            </article>
+          </a>
+
+          <a class="tile is-parent" @click="toNewsItem(news[1].id)">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :active="loading"></b-skeleton>
+              <b-skeleton size="is-small" :active="loading"></b-skeleton>
+              <p class="title is-6" v-if="!loading">{{ news[1].title }}</p>
+              <p class="subtitle is-6" v-if="!loading">{{ news[1].published_at }}</p>
+            </article>
+          </a>
+        </div>
+          
+        <div class="tile is-ancestor">
+          <a class="tile is-parent" @click="toNewsItem(news[2].id)">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :active="loading"></b-skeleton>
+              <b-skeleton size="is-small" :active="loading"></b-skeleton>
+              <p class="title is-6" v-if="!loading">{{ news[2].title }}</p>
+              <p class="subtitle is-6" v-if="!loading">{{ news[2].published_at }}</p>
+            </article>
+          </a>
+          <a class="tile is-parent" @click="toNewsItem(news[3].id)">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :active="loading"></b-skeleton>
+              <b-skeleton size="is-small" :active="loading"></b-skeleton>
+              <p class="title is-6" v-if="!loading">{{ news[3].title }}</p>
+              <p class="subtitle is-6" v-if="!loading">{{ news[3].published_at }}</p>
+            </article>
+          </a>
+          <a class="tile is-parent" @click="toNewsItem(news[4].id)">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :active="loading"></b-skeleton>
+              <b-skeleton size="is-small" :active="loading"></b-skeleton>
+              <p class="title is-6" v-if="!loading">{{ news[4].title }}</p>
+              <p class="subtitle is-6" v-if="!loading">{{ news[4].published_at }}</p>
+            </article>
+          </a>
+        </div>
+        
 
         <section class="section">
           <div class="title">
             Intesting.com
           </div>
-
-          <div class="tile is-ancestor">
-            <a class="tile is-parent">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large"></b-skeleton>
-                <b-skeleton size="is-small"></b-skeleton>
-              </article>
-            </a>
-            <a class="tile is-parent">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large"></b-skeleton>
-                <b-skeleton size="is-small"></b-skeleton>
-              </article>
-            </a>
-            <a class="tile is-parent">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large"></b-skeleton>
-                <b-skeleton size="is-small"></b-skeleton>
-              </article>
-            </a>
-          </div>
-
-          <div class="tile is-ancestor">
-            <a class="tile is-parent">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large"></b-skeleton>
-                <b-skeleton size="is-small"></b-skeleton>
-              </article>
-            </a>
-            <a class="tile is-parent">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large"></b-skeleton>
-                <b-skeleton size="is-small"></b-skeleton>
-              </article>
-            </a>
-            <a class="tile is-parent">
-              <article class="tile is-child box">
-                <b-skeleton size="is-large"></b-skeleton>
-                <b-skeleton size="is-small"></b-skeleton>
-              </article>
-            </a>
-          </div>
-
         </section>
+
+        <div class="tile is-ancestor">
+          <a class="tile is-parent">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :animated="false"></b-skeleton>
+              <b-skeleton size="is-small" :animated="false"></b-skeleton>
+            </article>
+          </a>
+          <a class="tile is-parent">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :animated="false"></b-skeleton>
+              <b-skeleton size="is-small" :animated="false"></b-skeleton>
+            </article>
+          </a>
+          <a class="tile is-parent">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :animated="false"></b-skeleton>
+              <b-skeleton size="is-small" :animated="false"></b-skeleton>
+            </article>
+          </a>
+        </div>
+
+        <div class="tile is-ancestor">
+          <a class="tile is-parent">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :animated="false"></b-skeleton>
+              <b-skeleton size="is-small" :animated="false"></b-skeleton>
+            </article>
+          </a>
+          <a class="tile is-parent">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :animated="false"></b-skeleton>
+              <b-skeleton size="is-small" :animated="false"></b-skeleton>
+            </article>
+          </a>
+          <a class="tile is-parent">
+            <article class="tile is-child box">
+              <b-skeleton size="is-large" :animated="false"></b-skeleton>
+              <b-skeleton size="is-small" :animated="false"></b-skeleton>
+            </article>
+          </a>
+        </div>
+
+        <div class="container mt-6">
+          <iframe src="https://ru.widgets.investing.com/live-currency-cross-rates?theme=lightTheme&hideTitle=true&roundedCorners=true&pairs=1,9530,1691,2111,2186" 
+            width="100%" height="250px" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0">
+          </iframe>
+        </div>
       </div>
       <div class="column">
         <section class="section">
@@ -118,6 +125,7 @@
         <History></History>
       </div>
     </div>
+    
   </div>
 </template>
 

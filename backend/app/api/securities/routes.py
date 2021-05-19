@@ -1,5 +1,5 @@
 from flask import Blueprint, make_response, jsonify, request
-import datetime
+from datetime import datetime, timedelta
 import requests
 
 from app.repository import securities_repo as repo
@@ -38,6 +38,7 @@ def get_security_info(security):
 
 # Transform data from i: {open, close, high, low, ..} to
 # [{x: date, y: {open, hight, low, close}}]
+# for ApexCharts
 def get_graph_info(candles):
     result = []
     for candle in candles:
@@ -47,10 +48,30 @@ def get_graph_info(candles):
         })
     return result
 
+# Transform data from i: {open, close, high, low, value, volume, begin, end} to
+# [[timestamp(open), open, high, low, close, volume]]
+def get_graph_info_tradingvue(candles):
+    indx = {
+      'open': 0, 'close': 1, 'high': 2, 'low': 3, 
+      'value': 4, 'volume': 5, 'begin': 6, 'end': 7
+    }
+    result = []
+    for i, candle in enumerate(candles):
+        dt = datetime.strptime(candle[indx['begin']], "%Y-%m-%d %H:%M:%S")
+        timestamp = (dt - datetime(1970, 1, 1)) / timedelta(seconds=1)
+        timestamp = int(timestamp) * 1000
+        arr = [
+          timestamp, candle[indx['open']], 
+          candle[indx['high']], candle[indx['low']],
+          candle[indx['close']], candle[indx['volume']]
+        ]
+        result.append(arr)
+    return result
+    
 
-def get_number_of_candles(start_date: datetime.datetime, interval: int):
+def get_number_of_candles(start_date: datetime, interval: int):
     "Получение общего количества свечей от указанной стартовой даты и интервала"
-    gap = datetime.datetime.now() - start_date
+    gap = datetime.now() - start_date
     gap_in_minutes = gap.days * 24 * 60
     number_of_candles = int(gap_in_minutes / interval)
     return number_of_candles
@@ -80,7 +101,7 @@ def get_candles(security):
         return "incorrect params", 400
 
     try:
-        start_date_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+        start_date_dt = datetime.strptime(start_date, "%Y-%m-%d")
     except ValueError:
         return "incorrect start date format", 400
     
@@ -92,17 +113,16 @@ def get_candles(security):
         '57/securities/{0}/candles.json?from={1}&interval={2}'\
         .format(security, start_date, interval)
     
-    candles, columns = [], None
+    candles = []
     r = requests.get(URL)
     if r.status_code != 200:
         return "error with receiving data from moscow exchange", 400
     data = r.json()
-    columns = data['candles']['columns']
     candles.extend(data['candles']['data'])
 
-    # print(repo.get_candles(
-    #     security_id=security, interval=interval, start_date=start_date_dt
-    # ))
+    print(repo.get_candles(
+        security_id=security, interval=interval, start_date=start_date_dt
+    ))
 
     # Если количество полученных свечей меньше нужного количества, 
     # значит нужно сделать еще некоторое кол-во запросов для получения остальных данных
@@ -118,8 +138,12 @@ def get_candles(security):
             candles.extend(data['candles']['data'])
             pointer += max_length_of_candles
 
-    graph_info = get_graph_info(candles)
-    resp_body = jsonify({'data': graph_info})
+    # graph_info = get_graph_info(candles)
+    graph_info_tradingvue = get_graph_info_tradingvue(candles)
+    # print(graph_info_tradingvue[0])
+
+    # resp_body = jsonify({'data': graph_info})
+    resp_body = jsonify({'candles': graph_info_tradingvue})
     resp = make_response(resp_body, 200)
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     return resp

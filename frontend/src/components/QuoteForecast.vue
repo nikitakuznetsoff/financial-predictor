@@ -83,10 +83,17 @@
         </div>
 
         <div class="column">
-          <Graph :tabIndex="period" 
+          <!-- <Graph 
+            :tabIndex="period" 
             :interval="interval"
             :algo="selectedAlgo"
-          ></Graph>
+          ></Graph> -->
+          <GraphTradingVue 
+            :tabIndex="period" 
+            :interval="interval"
+            :algo="selectedAlgo"
+            :indexBased="true"
+          ></GraphTradingVue>
         </div>
     </div>
 
@@ -122,11 +129,11 @@
       </div>
     </section>
 
-    <section class="section mx-6">
+    <!-- <section class="section mx-6">
       <h1 class="title">
         Идеи
       </h1>
-    </section>
+    </section> -->
 
   </div>
 </template>
@@ -134,12 +141,14 @@
 <script>
 import axios from 'axios'
 import API_URL from '@/common/config'
-import Graph from '@/components/Graph.vue'
+// import Graph from '@/components/Graph.vue'
+import GraphTradingVue from '@/components/GraphTradingVue.vue'
 
 export default {
   name: 'Quote',
   components: {
-    Graph
+    // Graph,
+    GraphTradingVue
   },
   data() {
     return {
@@ -148,7 +157,7 @@ export default {
       quote_is_empty: false,
       errored: false,
       error_text: null,
-
+      
       period: 0,
       interval: 1,
       selectedAlgo: 'ARIMA',

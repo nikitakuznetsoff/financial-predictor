@@ -7,13 +7,13 @@
           <p>ALFT</p>
           <p>Акции</p>
         </div> -->
-       <b-skeleton :animated="true" :count="2" :size="is-large"></b-skeleton>
+       <b-skeleton :animated="false" :count="2"></b-skeleton>
     </div>
     <div class="box">
-       <b-skeleton :animated="true" :count="2" :size="is-large"></b-skeleton>
+       <b-skeleton :animated="false" :count="2"></b-skeleton>
     </div>
     <div class="box">
-       <b-skeleton :animated="true" :count="2" :size="is-large"></b-skeleton>
+       <b-skeleton :animated="false" :count="2"></b-skeleton>
     </div>
   </div>
     

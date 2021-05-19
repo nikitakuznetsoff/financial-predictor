@@ -1,10 +1,10 @@
 import json
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer, DateTime, ARRAY
 from passlib.hash import pbkdf2_sha256
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
 from app.config import Config
-from app.models.base import Base
+from .base import Base
 
 
 class User(Base):
@@ -13,6 +13,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, unique=True)
     password = Column(String)
+    registration = Column(DateTime)
+    subscriptions = Column(ARRAY(String))
+    
 
     def hash_password(self, password):
         self.password = pbkdf2_sha256.encrypt(password)

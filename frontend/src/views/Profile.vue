@@ -7,7 +7,6 @@
               <p class="title">Имя пользователя</p>
             </li>
             <li class="mt-2">
-              
               <p class="is-size-6">
                 <b-icon
                   icon="calendar"
@@ -33,15 +32,12 @@
           <Watchlist :userID="id"></Watchlist>
         </b-tab-item>
         <b-tab-item label="Настройки" icon="cog">
-          
-        
           <div class="columns is-centered">
             <div class="column is-half">
                 <section class="section">
                     <h1 class="title is-4 has-text-centered">  
                         Пользовательские настройки
                     </h1>
-
                     <div class="notification is-primary is-light">
                       <div class="level">
                         <div class="level-left">
@@ -105,13 +101,10 @@
                       </div>
                     </div>   
                 </section>
-            </div>
-        </div>
+              </div>
+          </div>
         </b-tab-item>
     </b-tabs>
-
-
-
   </div>
 </template>
 
@@ -120,43 +113,43 @@ import API_URL from '@/common/config'
 import Watchlist from '@/components/Watchlist.vue'
 
 export default {
-    name: 'Profile',
-    components: {
-      Watchlist
-    },
-    data() {
-        return {
-            loading: true,
-            email: null,
-            id: null
-        }
-    },
-    methods: {
-        getProfileInfo() {
-            this.$http.get(API_URL+'/users')
-            .then(resp => {
-                this.email = resp.data.email;
-                this.id = resp.data.id;
-            })
-            .catch(err => {
-                console.log(err);
-                if (err.response.status == 401) {
-                    this.$store.dispatch('logout')
-                    .then(() => this.$router.push('/'));
-                } else {
-                    this.$buefy.toast.open({
-                        type: 'is-danger',
-                        message: err.response.data
-                    });
-                }
-            })
-            .finally(() => {
-                this.loading = false;
-            })
-        }
-    },
-    created() {
-        this.getProfileInfo()
+  name: 'Profile',
+  components: {
+    Watchlist
+  },
+  data() {
+    return {
+      loading: true,
+      email: null,
+      id: null
     }
+  },
+  methods: {
+    getProfileInfo() {
+      this.$http.get(API_URL+'/users')
+      .then(resp => {
+        this.email = resp.data.email;
+        this.id = resp.data.id;
+      })
+      .catch(err => {
+        console.log(err);
+        if (err.response.status == 401) {
+          this.$store.dispatch('logout')
+          .then(() => this.$router.push('/'));
+        } else {
+          this.$buefy.toast.open({
+            type: 'is-danger',
+            message: err.response.data
+          });
+        }
+      })
+      .finally(() => {
+        this.loading = false;
+      })
+    }
+  },
+  created() {
+    this.getProfileInfo()
+  }
 }
 </script>

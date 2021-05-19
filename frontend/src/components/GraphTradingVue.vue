@@ -7,8 +7,16 @@
       :height="500"
     ></b-skeleton>
     <section class v-if="!loading">
-        <!-- start date: {{ startDate }} -->
-        <apexchart type="candlestick" :options="chartOptions" :series="candles" height="600"></apexchart>
+        <trading-vue 
+          :data="candles" 
+          :titleTxt="this.$route.params.name"
+          :indexBased="true"
+          :width="1300"
+          :height="600"
+          :color-back="'#fff'"
+          :color-grid="'#eee'"
+          :color-text="'#333'">
+        </trading-vue>
     </section>
     
   </div>
@@ -17,11 +25,12 @@
 <script>
 import axios from 'axios'
 import API_URL from '../common/config'
+import TradingVue from 'trading-vue-js'
 
 export default {
   name: 'Graph',
   components: {
-
+    TradingVue
   },
   props: {
     interval: Number,
@@ -36,30 +45,12 @@ export default {
       errored: false,
       error_text: null,
 
-      chartOptions: {
-        chart: {
-          type: 'candlestick',
-        },
-        animations: {
-          enabled: true,
-          speed: 2000,
-        },
-        annotations: {
-          xaxis: [
-          ],
-          points: [
-          ]
-        },
-        xaxis: {
-          type: 'category',
-          
-        },
-        yaxis: {
-          tooltip: {
-            enabled: true
-          }
-        },
+      chart: {
+        type: "Candles",
+        data: [],
+        indexBased: true
       },
+
       intervals: {
         'day': 1000 * 60 * 60 * 24,
         'week': 1000 * 60 * 60 * 24 * 7,
@@ -81,17 +72,17 @@ export default {
     $route: 'getCandles',
     startDate: function() {
       this.getCandles();
-      // this.getPrediction();
+      this.getPrediction();
     },
     interval: function() {
       this.getCandles();
-      // this.getPrediction();
+      this.getPrediction();
     },
     algo: function() {
       this.candles[0]['data'].pop();
       this.chartOptions.annotations.points.pop();
       this.chartOptions.annotations.xaxis.pop();
-      // this.getPrediction();
+      this.getPrediction();
     }
   },
   methods: {
@@ -109,8 +100,8 @@ export default {
         if (response.status != 200) {
           this.candles_is_empty = true;
         } else {
-          this.candles = [ response.data ];
-          // console.log(this.candles[0][0])
+          this.candles = { ohlcv: response.data.candles };
+          this.chart.data = response.data.candles;
         }
       })
       .catch(e => {
