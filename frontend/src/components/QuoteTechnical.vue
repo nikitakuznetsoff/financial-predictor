@@ -63,7 +63,7 @@ export default {
       this.quote_is_empty = this.error = false;
       this.loading = true;
 
-      axios.get(API_URL + '/security/' + this.$route.params.name)
+      axios.get(API_URL + '/security/' + this.$route.params.name + '/description')
       .then(response => {
         if (response.status != 200) {
           this.quote_is_empty = true;

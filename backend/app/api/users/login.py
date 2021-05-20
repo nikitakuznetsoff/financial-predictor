@@ -9,11 +9,23 @@ bp = Blueprint('login', __name__, url_prefix='/api/login')
 
 def login_required():
     def decorator(f):
-        if not request.authorization or not request.authorization.password:
-            return "missing the authorization header", 401
-        token = request.authorization.password
-        if not User.verify_auth_token(token):
+        if 'Authorization' not in request.headers:
+            return "unauthorized", 401
+        try:
+            method, token = request.headers['Authorization'].split(' ')
+        except:
+            return "incorrect auth method or token", 401 
+        
+        if method != 'Basic':
+            'incorrect auth method', 401
+        
+        user_id = User.verify_auth_token(token)
+        if not user_id:
             return "error with validation access token", 401
+        
+        user = repo.get_user_by_id(user_id)
+        if not user:
+            return "incorrect user id", 400
         return f
     return decorator
 

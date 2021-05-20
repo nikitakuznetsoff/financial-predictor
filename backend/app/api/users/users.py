@@ -31,7 +31,6 @@ def get_post_user():
         if 'Authorization' not in request.headers:
             return "unauthorized", 401
         try:
-            print(request.headers['Authorization'])
             method, token = request.headers['Authorization'].split(' ')
         except:
             return "incorrect auth method or token", 401 
@@ -47,7 +46,8 @@ def get_post_user():
         if not user:
             return "incorrect user id", 400
 
-        data = { 'id': user.id, 'email': user.email }
+        user_data = user.get_dict_repr()
+        data = { 'user': user_data }
         return make_response(
             jsonify(data),200
         )

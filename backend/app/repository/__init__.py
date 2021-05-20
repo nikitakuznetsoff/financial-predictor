@@ -1,12 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-# import motor.motor_asyncio
 from pymongo import MongoClient
 
 from .postgres import PostgresRepository
 from .mongo import MongoRepository
-# from app.config import Config
-# from app.models import Base
+
 
 from app.config import Config
 from app.models import Base

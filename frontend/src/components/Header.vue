@@ -33,21 +33,30 @@
             </div>
             </section>
             <section v-else>
-              <b-table
-                :data="findedInstruments"
-                narrowed
-              >
-                <b-table-column field="id" v-slot="props">
-                  {{ props.row.id }}
-                </b-table-column>
-                <b-table-column field="name" v-slot="props">
-                  {{ props.row.name }}
-                </b-table-column>
-                <b-table-column field="type" v-slot="props">
-                  {{ props.row.type }}
-                </b-table-column>
+              <section v-if="findedInstruments==null">
+                <p :v-if="findedInstruments==null">Не найдено</p>
+              </section>
+              <section v-else>
+                <b-table
+                  :data="findedInstruments"
+                  narrowed
+                >
+                  <b-table-column field="secid" v-slot="props">
+                    {{ props.row.secid }}
+                  </b-table-column>
+                  <b-table-column field="name" v-slot="props">
+                    {{ props.row.name }}
+                  </b-table-column>
+                  <b-table-column field="type" v-slot="props">
+                    {{ props.row.type }}
+                  </b-table-column>
 
-              </b-table>
+                </b-table>
+              </section>
+
+            
+
+              
             </section>
           </div>
         </div>
@@ -121,6 +130,7 @@
 
 <script>
 import Login from '@/components/Login.vue'
+import API_URL from '@/common/config'
 
 export default {
   name: 'Header',
@@ -161,7 +171,7 @@ export default {
   computed: {
     dropdownMenuStyle: function() {
       if (this.dropdownMenuStatus == true) {
-        return "display: flex; position: absolute; min-width: 250px; min-height: 25px"
+        return "display: flex; position: absolute; min-width: 250px; min-height: 85px"
       } else {
         return "display: none"
       }
@@ -170,15 +180,10 @@ export default {
   methods: {
     focusedInput() {
       this.dropdownMenuStatus = true;
-      if (this.search != '') {
-        this.changedSearch();
-      } else {
-        this.isLoading=true;
-      }
+      this.fetchSecurity(this.search);
     },
     changedSearch() {
-      this.findedInstruments = this.knownInstruments;
-      this.isLoading = false;
+      this.fetchSecurity(this.search);
     },
     onSubmit() {
       this.$router.push({ name: 'QuoteForecast', params: { name: this.search }})
@@ -190,6 +195,20 @@ export default {
       this.$store.dispatch('logout')
       .then(() => {
           this.$router.push('/')
+      })
+    },
+    fetchSecurity(id) {
+      this.isLoading = true;
+      this.findedInstruments = null;
+
+      this.$http.get(API_URL + '/security/' + id)
+      .then(response => {
+        if (response.status == 200) {
+          this.findedInstruments = response.data.securities;
+        } 
+      })
+      .finally(() => {
+        this.isLoading = false;
       })
     }
   },

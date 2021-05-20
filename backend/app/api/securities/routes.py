@@ -1,8 +1,13 @@
 from flask import Blueprint, make_response, jsonify, request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from bson import json_util
+
 import requests
 
-from app.repository import securities_repo as repo
+from app.repository import securities_repo, users_repo
+from app.models import User
+from app.api.users import login_required
+
 
 bp = Blueprint('security', __name__, url_prefix='/api/security')
 
@@ -21,8 +26,23 @@ def json_decoder_security_info(arr):
     return result
 
 
-@bp.route('/<string:security>', methods=['GET'])
-def get_security_info(security):
+@bp.route('/<string:security_id>', methods=['GET'])
+def get_security_by_id(security_id):
+    securities = securities_repo.get_securities_by_id(security_id)
+    if not securities:
+        return "not found securities with this ID", 404
+
+    print(securities)
+    response_body = json_util.dumps({'securities': securities})
+    resp = make_response(
+        response_body, 200
+    )
+    resp.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return resp
+
+
+@bp.route('/<string:security>/description', methods=['GET'])
+def get_security_description(security):
     url = 'http://iss.moex.com/iss/securities/{0}.json'.format(security)
     r = requests.get(url)
     info = r.json()
@@ -35,6 +55,100 @@ def get_security_info(security):
     )
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     return resp
+
+###
+
+def get_curr_price_and_name(security_id):
+    URL = "http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/57/securities/{0}.json"\
+        .format(security_id)
+    r = requests.get(URL)
+    data = r.json()
+    return data['securities']['data'][0][3], data['securities']['data'][0][2]
+
+
+def get_last_price(security_id, from_date, till_date):
+    URL = "http://iss.moex.com/iss/history/engines/stock/" + \
+        "markets/shares/sessions/total/boardgroups/57/securities/"+\
+        "{0}.json?from={1}&till={2}".format(security_id, from_date, till_date)
+    r = requests.get(URL)
+    data = r.json()
+    last_price = data['history']['data'][-1][11]
+    return last_price
+    
+
+def get_procent(base, value):
+    division = value / base
+    if division > 0:
+        division = round((division-1) * 100)
+    else:
+        division = round((1 - division) * 100) * -1
+    return division
+
+
+def get_history_of_security(security_id):    
+    today = date.today()
+    week = timedelta(days=7)
+    month = timedelta(days=31)
+    year = timedelta(days=365)
+    gap = timedelta(days=3)
+    
+    curr_price, name = get_curr_price_and_name(security_id)
+    week_price = get_last_price(
+        security_id, 
+        (today-week-gap).strftime("%Y-%m-%d"), 
+        (today-week).strftime("%Y-%m-%d")
+    )
+    month_price = get_last_price(
+        security_id, 
+        (today-month-gap).strftime("%Y-%m-%d"), 
+        (today-month).strftime("%Y-%m-%d")
+    )
+    year_price = get_last_price(
+        security_id, 
+        (today-year-gap).strftime("%Y-%m-%d"), 
+        (today-year).strftime("%Y-%m-%d")
+    )
+    result = {
+        'id': security_id,
+        'name': name,
+        'price': curr_price,
+        'day': 0,
+        'week': get_procent(curr_price, week_price),
+        'month': get_procent(curr_price, month_price),
+        'year': get_procent(curr_price, year_price),
+        'type': 'Акции',
+        'currency': 'SUR'
+    }
+    return result
+
+
+@bp.route('/subscriptions', methods=['GET'])
+def get_subscriptions():
+    if 'Authorization' not in request.headers:
+        return "unauthorized", 401
+    try:
+        method, token = request.headers['Authorization'].split(' ')
+    except:
+        return "incorrect auth method or token", 401 
+    if method != 'Basic':
+        'incorrect auth method', 401
+    user_id = User.verify_auth_token(token)
+    if not user_id:
+        return "error with validation access token", 401
+    user = users_repo.get_user_by_id(user_id)
+    if not user:
+        return "incorrect user id", 400
+
+    results = []
+    for sub in user.subscriptions:
+        results.append(get_history_of_security(sub))
+    
+    print(results)
+    resp_body = jsonify({'subscriptions': results})
+    resp = make_response(resp_body, 200)
+    resp.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return resp    
+
 
 # Transform data from i: {open, close, high, low, ..} to
 # [{x: date, y: {open, hight, low, close}}]
@@ -120,9 +234,9 @@ def get_candles(security):
     data = r.json()
     candles.extend(data['candles']['data'])
 
-    print(repo.get_candles(
-        security_id=security, interval=interval, start_date=start_date_dt
-    ))
+    # print(repo.get_candles(
+    #     security_id=security, interval=interval, start_date=start_date_dt
+    # ))
 
     # Если количество полученных свечей меньше нужного количества, 
     # значит нужно сделать еще некоторое кол-во запросов для получения остальных данных

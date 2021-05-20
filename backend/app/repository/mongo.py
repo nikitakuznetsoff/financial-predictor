@@ -45,7 +45,7 @@ class MongoRepository:
     
 
     # Получение информации о финансовом инструменте
-    def get_security_info(self, security_id):
+    def get_security_description(self, security_id):
         loop = asyncio.get_event_loop()
         description = loop.run_until_complete(self._get_description(security_id))
 
@@ -64,6 +64,15 @@ class MongoRepository:
 
             description = data_changed
         return description
+
+
+    def get_securities_by_id(self, security_id):
+        securities = self.client.finPredictor.securities.find({
+            "secid": { "$eq": security_id }
+        })
+        arr = list(securities)
+        return arr
+    
     
     def _get_number_of_required_candles(self, interval, start_date):
             gap = datetime.now() - start_date

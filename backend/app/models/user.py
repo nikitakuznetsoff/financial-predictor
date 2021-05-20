@@ -2,6 +2,7 @@ import json
 from sqlalchemy import Column, String, Integer, DateTime, ARRAY
 from passlib.hash import pbkdf2_sha256
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
+from datetime import datetime
 
 from app.config import Config
 from .base import Base
@@ -12,6 +13,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, unique=True)
+    username = Column(String, unique=True)
     password = Column(String)
     registration = Column(DateTime)
     subscriptions = Column(ARRAY(String))
@@ -26,9 +28,12 @@ class User(Base):
     def get_dict_repr(self):
         d = {
             'id': self.id,
-            'email': self.email
+            'email': self.email,
+            'registration': self.registration.strftime("%Y-%m-%d %H:%M:%S"),
+            'subscriptions': self.subscriptions,
+            'username': self.username
         }
-        return json.dumps(d)
+        return d
 
     def generate_auth_token(self, expiration=6000):
         s = Serializer(Config.SECRET_KEY, expires_in=expiration)

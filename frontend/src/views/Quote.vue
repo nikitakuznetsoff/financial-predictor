@@ -3,8 +3,8 @@
         <section class="hero mb-5 is-primary">
             <div class="hero-body mx-6">
                 <section v-if="loading">
-                  <li>
-                    <ul>
+                  <ul>
+                    <li>
                       <p class="title"> 
                         <b-skeleton 
                           size="is-large" 
@@ -12,8 +12,8 @@
                           :width="200"
                         ></b-skeleton>
                       </p>
-                    </ul>
-                    <ul>
+                    </li>
+                    <li>
                       <p class="subtitle">
                         <b-skeleton 
                           size="is-small" 
@@ -21,8 +21,8 @@
                           :width="200">
                         </b-skeleton>
                       </p>
-                    </ul>
-                  </li> 
+                    </li>
+                  </ul> 
                 </section>
                 
                 <section v-else>
@@ -105,7 +105,7 @@ export default {
       this.quote_is_empty = this.error = false;
       this.loading = true;
 
-      axios.get(API_URL + '/security/' + this.$route.params.name)
+      axios.get(API_URL + '/security/' + this.$route.params.name + '/description')
       .then(response => {
         if (response.status != 200) {
           this.quote_is_empty = true;

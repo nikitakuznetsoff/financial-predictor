@@ -1,11 +1,14 @@
 <template>
   <div class="watchlist">
-    <div class="container">
       <div class="columns is-centered mt-3">
         <div class="column">
           <div class="card mx-2">
             <div class="card-content">
-              <div class="level">
+              <b-skeleton 
+                size="is-large" 
+                v-if="loading"
+              ></b-skeleton>
+              <div class="level" v-if="!loading">
                 <div class="level-left mr-3">
                   <ul>
                     <li><p>Сегодня</p></li>
@@ -25,7 +28,11 @@
         <div class="column">
           <div class="card">
             <div class="card-content">
-              <div class="level">
+              <b-skeleton 
+                size="is-large" 
+                v-if="loading"
+              ></b-skeleton>
+              <div class="level" v-if="!loading">
                 <div class="level-left mr-3">
                   <ul>
                     <li><p>Неделя</p></li>
@@ -45,7 +52,11 @@
         <div class="column">
           <div class="card">
             <div class="card-content">
-              <div class="level">
+              <b-skeleton 
+                size="is-large" 
+                v-if="loading"
+              ></b-skeleton>
+              <div class="level" v-if="!loading">
                 <div class="level-left mr-3">
                   <ul>
                     <li><p>Месяц</p></li>
@@ -65,7 +76,11 @@
         <div class="column">
           <div class="card">
             <div class="card-content">
-              <div class="level">
+              <b-skeleton 
+                size="is-large" 
+                v-if="loading"
+              ></b-skeleton>
+              <div class="level" v-if="!loading">
                 <div class="level-left mr-3">
                   <ul>
                     <li><p>Год</p></li>
@@ -82,11 +97,7 @@
           </div>
         </div>
       </div>
-    </div>
 
-  
-
-    <div class="container mb-6">
       <section class="section">
         <h1 class="title is-4">
           Список отслеживания
@@ -94,8 +105,14 @@
       </section>
       
       <div class="box">
+        <b-skeleton 
+          size="is-large" 
+          v-if="loading"
+        ></b-skeleton>
+        
         <b-table
-          :data="instrumentsData"
+          :data="data"
+          v-if="!loading"
         >
           <b-table-column field="id" label="Код" sortable v-slot="props">
             <router-link :to="{ name: 'QuoteForecast', params: { name: props.row.id }}">{{ props.row.id }}</router-link>
@@ -154,55 +171,38 @@
           </b-table-column>
         </b-table>
       </div>
-    </div>
   </div>
 </template>
 
 <script>
+import API_URL from '@/common/config'
+
 export default {
   name: 'Watchlist',
-  props: {
-    userID: Number
-  },
   data() {
     return {
-      qwe: 0,
-      instrumentsData: [
-        {
-          id: 'AFLT',
-          name: 'Aeroflot',
-          price: 123,
-          day: 1.2,
-          week: 1.2,
-          month: -1.2,
-          year: 1.2,
-          type: 'Акции',
-          currency: 'SUR'
-        },
-        {
-          id: 'AAPL',
-          name: 'Apple',
-          price: 123,
-          day: 1.2,
-          week: 1.2,
-          month: 1.2,
-          year: 1.2,
-          type: 'Акции',
-          currency: 'USD'
-        },
-        {
-          id: 'GAZP',
-          name: 'Gazprom',
-          price: 123,
-          day: 1.2,
-          week: 1.2,
-          month: 1.2,
-          year: 1.2,
-          type: 'Акции',
-          currency: 'SUR'
-        } 
-      ],
+      loading: true,
+      data: null,
     }
+  },
+  methods: {
+    getSubscriptionsInfo() {
+      this.loading = true;
+      this.$http.get(API_URL+'/security/subscriptions')
+      .then(resp => {
+        this.data = resp.data.subscriptions;
+        // console.log(this.data);
+      })
+      .catch(e => {
+        console.log(e);
+      })
+      .finally(() => {
+        this.loading = false;
+      })
+    }
+  },
+  created() {
+    this.getSubscriptionsInfo();
   }
 }
 </script>

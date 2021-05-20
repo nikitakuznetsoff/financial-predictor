@@ -139,8 +139,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-import API_URL from '@/common/config'
 // import Graph from '@/components/Graph.vue'
 import GraphTradingVue from '@/components/GraphTradingVue.vue'
 
@@ -202,35 +200,7 @@ export default {
       ]
     }
   },
-  created() {
-    this.fetchData()
-  },
-  watch: {
-    $route: 'fetchData'
-  },
   methods: {
-    fetchData() {
-      this.quote = this.error_text = null;
-      this.quote_is_empty = this.error = false;
-      this.loading = true;
-
-      axios.get(API_URL + '/security/' + this.$route.params.name)
-      .then(response => {
-        if (response.status != 200) {
-          this.quote_is_empty = true;
-        } else {
-          this.quote = response.data.security;  
-        }
-      })
-      .catch(e => {
-        console.log(e);
-        this.errored = true;
-        this.error_text = e;
-      })
-      .finally(() => {
-        this.loading = false
-      });
-    },
     isIntervalAvailable(interval) {
       let intervals = [1, 10, 60, 24, 7, 31, 4];
       let interval_slice = null;

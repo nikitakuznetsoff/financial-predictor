@@ -4,15 +4,28 @@
         <div class="hero-body mx-6">
           <ul>
             <li>
-              <p class="title">Имя пользователя</p>
+              <b-skeleton 
+                size="is-large" 
+                v-if="loading"
+                :width="200"
+              ></b-skeleton>
+              <p class="title" v-if="!loading">{{ user.username }}</p>
             </li>
             <li class="mt-2">
-              <p class="is-size-6">
+              <b-skeleton 
+                size="is-medium" 
+                v-if="loading"
+                :width="200"
+              ></b-skeleton>
+              <p 
+                class="is-size-6"
+                v-if="!loading"
+              >
                 <b-icon
                   icon="calendar"
                   size="is-small">
                 </b-icon>
-                Зарегистрировался  <span class="tag is-primary is-light mx-2 is-size-7">2 дня назад</span>
+                Зарегистрировался  <span class="tag is-primary is-light mx-2 is-size-7">{{ regTime }} дня назад</span>
               </p>
             </li>
           </ul>
@@ -21,16 +34,30 @@
     </section>
 
     <b-tabs type="is-boxed is-centered mt-3">
-        <b-tab-item label="Отслеживаемые" icon="account-details">
-          <!-- <div class="has-text-centered mt-6 mb-6">
-            <b-icon
-              icon="message-bulleted-off"
-              size="is-medium">
-            </b-icon>
-            <p>У пользователя нет отслеживаемых инструментов</p>
-          </div> -->
-          <Watchlist :userID="id"></Watchlist>
-        </b-tab-item>
+      <b-tab-item label="Отслеживаемые" icon="account-details">
+        <div class="container mb-6">
+          <section v-if="loading">
+            <b-skeleton 
+              size="is-medium" 
+              v-if="!loading"
+            ></b-skeleton>
+          </section>
+          <section v-else>
+            <section v-if="user.subscriptions == null">
+              <div class="has-text-centered mt-6 mb-6">
+                <b-icon
+                  icon="message-bulleted-off"
+                  size="is-medium">
+                </b-icon>
+                <p>У пользователя нет отслеживаемых инструментов</p>
+              </div>
+            </section>
+            <section v-else>
+              <Watchlist></Watchlist>
+            </section>
+          </section>
+        </div>
+      </b-tab-item>
         <b-tab-item label="Настройки" icon="cog">
           <div class="columns is-centered">
             <div class="column is-half">
@@ -45,9 +72,9 @@
                             icon="account"
                             size="is-medium">
                           </b-icon>
-                          <ul class="mx-6">
+                          <ul class="mx-6" v-if="!loading">
                             <li><strong>Имя пользователя</strong></li>
-                            <li>{{ email }}</li>
+                            <li>{{ user.username }}</li>
                           </ul>
                         </div>
                         <div class="button is-primary">Изменить имя пользователя</div>
@@ -61,9 +88,9 @@
                             icon="email"
                             size="is-medium">
                           </b-icon>
-                          <ul class="mx-6">
+                          <ul class="mx-6" v-if="!loading">
                             <li><strong>Электронная почта</strong></li>
-                            <li>{{ email }}</li>
+                            <li>{{ user.email }}</li>
                           </ul>
                         </div>
                         <div class="button is-primary">Изменить email</div>
@@ -120,16 +147,22 @@ export default {
   data() {
     return {
       loading: true,
-      email: null,
-      id: null
+      user: null,
+    }
+  },
+  computed: {
+    regTime: function() {
+      let now = new Date();
+      let date = new Date(this.user.registration);
+      let gap = now - date;
+      return Math.floor(gap / 1000 / 60 / 60 / 24)
     }
   },
   methods: {
     getProfileInfo() {
       this.$http.get(API_URL+'/users')
       .then(resp => {
-        this.email = resp.data.email;
-        this.id = resp.data.id;
+        this.user = resp.data.user;
       })
       .catch(err => {
         console.log(err);
