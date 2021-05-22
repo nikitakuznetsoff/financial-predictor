@@ -1,17 +1,17 @@
 <template>
-  <div class="graph ml-3">
+  <div class="graph">
     <b-skeleton 
       size="is-large" 
       v-if="loading" 
       :animated="true"
-      :height="500"
+      :height="600"
     ></b-skeleton>
     <section class v-if="!loading">
         <trading-vue 
-          :data="candles" 
+          :data="graph" 
           :titleTxt="this.$route.params.name"
           :indexBased="true"
-          :width="1300"
+          :width="this.width"
           :height="600"
           :color-back="'#fff'"
           :color-grid="'#eee'"
@@ -35,7 +35,8 @@ export default {
   props: {
     interval: Number,
     tabIndex: Number,
-    algo: String
+    algo: String,
+    width: Number
   },
   data() {
     return {
@@ -45,10 +46,12 @@ export default {
       errored: false,
       error_text: null,
 
-      chart: {
-        type: "Candles",
-        data: [],
-        indexBased: true
+      graph: {
+          chart: {
+          type: "Candles",
+          data: [],
+          indexBased: true
+        }
       },
 
       intervals: {
@@ -101,7 +104,7 @@ export default {
           this.candles_is_empty = true;
         } else {
           this.candles = { ohlcv: response.data.candles };
-          this.chart.data = response.data.candles;
+          this.graph.chart.data = response.data.candles;
         }
       })
       .catch(e => {

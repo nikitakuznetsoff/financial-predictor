@@ -1,13 +1,13 @@
 from flask import Blueprint, request, make_response, jsonify
 from flask_httpauth import HTTPBasicAuth
+from functools import wraps
 
 from app.models import User
 from app.repository import users_repo as repo
 
-
-bp = Blueprint('login', __name__, url_prefix='/api/login')
-
-def login_required():
+ 
+def login_required(func):
+    @wraps(func)
     def decorator(f):
         if 'Authorization' not in request.headers:
             return "unauthorized", 401
@@ -27,25 +27,7 @@ def login_required():
         if not user:
             return "incorrect user id", 400
         return f
+    if func:
+        return decorator(func)
     return decorator
 
-
-@bp.route('', methods=['POST', 'GET'])
-def auth_post():
-    if request.method == 'POST':
-        body = request.get_json()
-        email = body.get('email')
-        password = body.get('password')
-
-        user = repo.get_user_by_email(email)
-        if not user:
-            return "unknown user", 404
-        if not user.verify_password(password):
-            return "incorrect password", 400
-        
-        token = user.generate_auth_token()
-        d = { 'user': user.id, 'token': token }
-        resp = make_response(jsonify(d), 200)
-        return resp
-    else:
-        return "incorrect method", 400

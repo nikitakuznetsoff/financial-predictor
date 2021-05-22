@@ -64,52 +64,52 @@
 
         <section class="section">
           <div class="title">
-            Intesting.com
+            Investing.com
           </div>
         </section>
+        
+        <section v-if="isInvestingNewsLoading">
+          <div class="tile is-ancestor"
+            v-for="v in [0,3,6]"
+            v-bind:key="v.id"
+          >
+            <div class="tile is-parent"
+                v-for="v in [0,1,2]"
+                v-bind:key="v.id">
+              <article 
+                class="tile is-child box"
+              >
+                <b-skeleton size="is-large" :animated="false"></b-skeleton>
+                <b-skeleton size="is-small" :animated="false"></b-skeleton>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section v-else>
+          <div class="tile is-ancestor"
+            v-for="v in [0,3,6]"
+            v-bind:key="v.id"
+          >
+            <div class="tile is-parent"
+                v-for="k in [0,1,2]"
+                v-bind:key="k.id">
+                
+              <div class="tile is-child box" >
+                <a v-bind:href="investingNews[v+k].link" target="_blank">
+                  <strong>{{ investingNews[v+k].title }}</strong>
+                </a>
+                <p>
+                  <span class="tag is-info is-light mr-2">{{ investingNews[v+k].author }}</span>
 
-        <div class="tile is-ancestor">
-          <a class="tile is-parent">
-            <article class="tile is-child box">
-              <b-skeleton size="is-large" :animated="false"></b-skeleton>
-              <b-skeleton size="is-small" :animated="false"></b-skeleton>
-            </article>
-          </a>
-          <a class="tile is-parent">
-            <article class="tile is-child box">
-              <b-skeleton size="is-large" :animated="false"></b-skeleton>
-              <b-skeleton size="is-small" :animated="false"></b-skeleton>
-            </article>
-          </a>
-          <a class="tile is-parent">
-            <article class="tile is-child box">
-              <b-skeleton size="is-large" :animated="false"></b-skeleton>
-              <b-skeleton size="is-small" :animated="false"></b-skeleton>
-            </article>
-          </a>
-        </div>
+                  {{ investingNews[v+k].published }}
+                </p>
+              </div>
+            </div>
+          </div>
 
-        <div class="tile is-ancestor">
-          <a class="tile is-parent">
-            <article class="tile is-child box">
-              <b-skeleton size="is-large" :animated="false"></b-skeleton>
-              <b-skeleton size="is-small" :animated="false"></b-skeleton>
-            </article>
-          </a>
-          <a class="tile is-parent">
-            <article class="tile is-child box">
-              <b-skeleton size="is-large" :animated="false"></b-skeleton>
-              <b-skeleton size="is-small" :animated="false"></b-skeleton>
-            </article>
-          </a>
-          <a class="tile is-parent">
-            <article class="tile is-child box">
-              <b-skeleton size="is-large" :animated="false"></b-skeleton>
-              <b-skeleton size="is-small" :animated="false"></b-skeleton>
-            </article>
-          </a>
-        </div>
+        </section>
 
+       
         <div class="container mt-6">
           <iframe src="https://ru.widgets.investing.com/live-currency-cross-rates?theme=lightTheme&hideTitle=true&roundedCorners=true&pairs=1,9530,1691,2111,2186" 
             width="100%" height="250px" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0">
@@ -122,7 +122,41 @@
               История поиска
             </p>
         </section>
-        <History></History>
+        <section v-if="isHistoryLoading">
+          <div class="box">
+            <b-skeleton :animated="false" :count="2"></b-skeleton>
+          </div>
+        </section>
+        <section v-else>
+          <div class="box" v-for="sec in history" v-bind:key="sec.id">
+            <router-link :to="{ name: 'QuoteForecast', params: { name: sec.secid }}">
+              <div class="level mx-4">
+                <div class="level-left">
+                  <ul>
+                    <li>
+                      <p class="is-size-4"><strong>{{ sec.secid }}</strong></p>
+                    </li>
+                    <li>
+                      {{ sec.name }}
+                    </li>
+                  </ul>
+                </div>
+                <div class="level-right has-text-centered">
+                  <ul>
+                    <li>
+                      <span class="tag is-success is-light is-medium">{{ sec.type }}</span>
+                    </li>
+                    <li>
+                      <span class="tag is-primary is-light is-medium mt-2">{{ sec.currency }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div> 
+            </router-link>
+            
+          </div>
+        </section>
+        
       </div>
     </div>
     
@@ -130,19 +164,70 @@
 </template>
 
 <script>
-
-import axios from 'axios'
 import API_URL from '@/common/config'
-import History from '@/components/History.vue'
 
 export default {
   name: 'Home',
   components: {
-    History
   },
   methods: {
     toNewsItem: function(id) {
       this.$router.push('/news/'+id)
+    },
+    getHistoryItems() {
+      this.isHistoryLoading = true;
+      let c_name = "history";
+      let c_start = document.cookie.indexOf(c_name + "=");
+      if (c_start != -1) {
+        c_start = c_start + c_name.length + 1;
+        let c_end = document.cookie.indexOf(";", c_start);
+        if (c_end == -1) {
+            c_end = document.cookie.length;
+        }
+        let arr = JSON.parse(document.cookie.substring(c_start, c_end));
+        if (arr.length > 0) {
+          this.$http.post(API_URL + "/security", {'ids': arr})
+          .then(response => {
+            this.history = response.data.securities;
+            // console.log(this.history);
+          })
+          .catch(e => {
+            console.log(e);
+          })
+          .finally(() => {
+            this.isHistoryLoading = false;
+          })
+        }
+      } else {
+        this.history = [];
+        this.isHistoryLoading = false;
+      }
+    },
+    getNews() {
+      this.loading = true;
+      this.$http.get(API_URL + "/news/moex")
+      .then(response => {
+        this.news = response.data.news
+      })
+      .catch(e => {
+        this.errored = true;
+        this.error_text = e;
+      })
+      .finally(() => (this.loading = false));
+    },
+    getInvestingNews() {
+      this.isInvestingNewsLoading = true;
+      this.$http.get(API_URL + "/news/investing")
+      .then(response => {
+        this.investingNews = response.data.entries;
+        console.log(this.investingNews[0])
+      })
+      .catch(e => {
+        console.log(e);
+      })
+      .finally(() => {
+        this.isInvestingNewsLoading = false;
+      })
     }
   },
   data() {
@@ -151,22 +236,22 @@ export default {
       loading: true,
       errored: false,
       error_text: null,
+
+      isInvestingNewsLoading: true,
+      investingNews: [],
+
+      isHistoryLoading: true,
+      history: null,
+
       style: {
         backgroundColor: '#FAFBFF',
       }
     }
   },
   mounted() {
-    axios.get(API_URL + "/news/moex")
-    .then(response => {
-      this.news = response.data.news
-    })
-    .catch(e => {
-      console.log(e);
-      this.errored = true;
-      this.error_text = e;
-    })
-    .finally(() => (this.loading = false));
+    this.getNews();
+    this.getHistoryItems();
+    this.getInvestingNews();
   }
 }
 </script>

@@ -8,7 +8,7 @@
                       <p class="title"> 
                         <b-skeleton 
                           size="is-large" 
-                          :active="loading"
+                          :animated="false"
                           :width="200"
                         ></b-skeleton>
                       </p>
@@ -17,7 +17,7 @@
                       <p class="subtitle">
                         <b-skeleton 
                           size="is-small" 
-                          :active="loading"
+                          :animated="false"
                           :width="200">
                         </b-skeleton>
                       </p>
@@ -35,7 +35,7 @@
                               unknown quote
                             </section>
                             <section v-else>
-                              {{ quote.LATNAME.value }}
+                              {{ quote.name }}
                             </section>
                           </p>
                         </li>
@@ -48,9 +48,30 @@
                     </div>
 
                     <div class="level-right">
-                      <div class="button is-primary is-light is-medium">
-                        Отслеживать
-                      </div>
+                      <section v-if="subscriptionLoading">
+                        <b-skeleton 
+                          size="is-large" 
+                          :animated="false"
+                          :width="150"
+                          :height="50"
+                        ></b-skeleton>
+                      </section>
+                      <section v-else>
+                        <div
+                          v-if="isSubscribed" 
+                          class="button is-primary is-light is-medium"
+                          @click="unsubscribe"
+                        >
+                          Отписаться
+                        </div>
+                        <div
+                          v-else
+                          class="button is-primary is-light is-medium" 
+                          @click="subscribe"
+                        >
+                          Подписаться
+                        </div>
+                      </section>
                     </div>
                   </nav>
 
@@ -64,7 +85,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import API_URL from '@/common/config'
 
 export default {
@@ -76,6 +96,10 @@ export default {
       quote_is_empty: false,
       errored: false,
       error_text: null,
+
+      subscriptionLoading: true,
+      subscriptions: null,
+      isSubscribed: false,
 
       period: 0,
       interval: 1,
@@ -94,10 +118,14 @@ export default {
     }
   },
   created() {
-    this.fetchData()
+    this.fetchData();
+    this.getSubscriptions();
   },
   watch: {
-    $route: 'fetchData'
+    $route: [
+      'fetchData',
+      'getSubscriptions'
+    ]
   },
   methods: {
     fetchData() {
@@ -105,7 +133,7 @@ export default {
       this.quote_is_empty = this.error = false;
       this.loading = true;
 
-      axios.get(API_URL + '/security/' + this.$route.params.name + '/description')
+      this.$http.get(API_URL + '/security/' + this.$route.params.name)
       .then(response => {
         if (response.status != 200) {
           this.quote_is_empty = true;
@@ -122,6 +150,48 @@ export default {
         this.loading = false
       });
     },
+    getSubscriptions() {
+      this.isSubscribed = false;
+      this.subscriptionLoading = true;
+      this.$http.get(API_URL + '/users/subscriptions')
+      .then(response => {
+        if (response.status == 200) {
+          this.subscriptions = response.data.subscriptions;
+          if (this.subscriptions.includes(this.quote.secid)) {
+            this.isSubscribed = true;
+          } else {
+            this.isSubscribed = false;
+          }
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        this.subscriptionLoading = false;
+      })
+    },
+    subscribe() {
+      this.$http.post(API_URL + '/users/subscribe', {'secid': this.quote.secid})
+      .then(() => {
+        console.log('Subscription successful');
+        this.subscriptions.push(this.quote.secid);
+        this.isSubscribed = true;
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+    },
+    unsubscribe() {
+      this.$http.post(API_URL + '/users/unsubscribe', {'secid': this.quote.secid})
+      .then(() => {
+        console.log('Unsubscription successful');
+        this.getSubscriptions();
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+    }
   },
 }
 </script>

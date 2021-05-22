@@ -82,7 +82,7 @@
           </b-menu> 
         </div>
 
-        <div class="column">
+        <div class="column" ref="graphColumn">
           <!-- <Graph 
             :tabIndex="period" 
             :interval="interval"
@@ -92,7 +92,7 @@
             :tabIndex="period" 
             :interval="interval"
             :algo="selectedAlgo"
-            :indexBased="true"
+            :width="this.width"
           ></GraphTradingVue>
         </div>
     </div>
@@ -107,7 +107,6 @@
           v-model="currentNews" 
           :data="news" 
           :items-to-show="4"
-          :icon-size="is-medium"
           >
           <template #item="list">
             <div class="card mx-4">
@@ -159,6 +158,7 @@ export default {
       period: 0,
       interval: 1,
       selectedAlgo: 'ARIMA',
+      width: 0,
 
       columns: [
         {
@@ -234,5 +234,8 @@ export default {
       }
     },
   },
+  mounted() {
+    this.width = this.$refs.graphColumn.offsetWidth;
+  }
 }
 </script>

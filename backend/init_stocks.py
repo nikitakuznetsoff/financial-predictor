@@ -11,6 +11,8 @@ for stock in data['securities']['data']:
     d = {
       'secid': stock[0],
       'name': stock[2],
+      'fullname': stock[9],
+      'currency': stock[16],
       'type': 'Акции'
     }
     client.finPredictor.securities.insert_one(d)

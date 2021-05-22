@@ -20,7 +20,8 @@ export default {
     this.$http.interceptors.response.use(undefined, function(err) {
       return new Promise(function() {
         if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
-          this.$store.dispatch("logout")
+          this.$buefy.toast.open('Текущая сессия истекла, авторизируйтесь заного');
+          this.$store.dispatch("logout");
         }
         throw err;
       })

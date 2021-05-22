@@ -66,6 +66,13 @@ class MongoRepository:
         return description
 
 
+    def get_security_by_id(self, security_id):
+        security = self.client.finPredictor.securities.find_one({
+            "secid": { "$eq": security_id }
+        })
+        return security
+
+
     def get_securities_by_id(self, security_id):
         securities = self.client.finPredictor.securities.find({
             "secid": { "$eq": security_id }

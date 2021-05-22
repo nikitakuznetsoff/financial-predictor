@@ -77,7 +77,7 @@
                             <li>{{ user.username }}</li>
                           </ul>
                         </div>
-                        <div class="button is-primary">Изменить имя пользователя</div>
+                        <div class="button is-primary" @click="changeUsernameDialog">Изменить имя пользователя</div>
                       </div>
                     </div>
 
@@ -93,7 +93,7 @@
                             <li>{{ user.email }}</li>
                           </ul>
                         </div>
-                        <div class="button is-primary">Изменить email</div>
+                        <div class="button is-primary" @click="changeEmailDialog">Изменить email</div>
                       </div>
                     </div>
 
@@ -109,7 +109,7 @@
                             <li>Изменить ваш пароль</li>
                           </ul>
                         </div>
-                        <div class="button is-primary">Изменить пароль</div>
+                        <div class="button is-primary" @click="changePasswordDialog">Изменить пароль</div>
                       </div>
                     </div>
 
@@ -124,7 +124,7 @@
                             <li><strong>Удаление профиля</strong></li>
                           </ul>
                         </div>
-                        <div class="button is-danger">Удалить профиль</div>
+                        <div class="button is-danger" @click="deleteAccountDialog">Удалить профиль</div>
                       </div>
                     </div>   
                 </section>
@@ -178,6 +178,112 @@ export default {
       })
       .finally(() => {
         this.loading = false;
+      })
+    },
+    changeUsernameDialog() {
+      this.$buefy.dialog.prompt({
+          message: `Введите новое имя пользователя`,
+          confirmText: 'Подтвердить',
+          cancelText: 'Отмена',
+          inputAttrs: {
+            placeholder: 'Имя пользователя',
+            maxlength: 15
+          },
+          trapFocus: true,
+          onConfirm: (value) => {
+            this.$http.post(API_URL+'/users/username', { username: value })
+            .then(response => {
+              if (response.status == 200) {
+                this.$buefy.toast.open({ message: 'Имя пользователя изменено', type: 'is-success'});
+              } else {
+                this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+              }
+            })
+            .catch(e => {
+              this.$buefy.toast.open({ message: e, type: 'is-danger'});
+              console.log(e);
+            })
+          }
+      })
+    },
+    changeEmailDialog() {
+      this.$buefy.dialog.prompt({
+          message: 'Введите новый адрес электронной почты',
+          confirmText: 'Подтвердить',
+          cancelText: 'Отмена',
+          inputAttrs: {
+            placeholder: 'Электронная почта',
+            maxlength: 15
+          },
+          trapFocus: true,
+          onConfirm: (value) => {
+            this.$http.post(API_URL+'/users/email', { email: value })
+            .then(response => {
+              if (response.status == 200) {
+                this.$buefy.toast.open({ message: 'Электронная почта изменена', type: 'is-success'});
+              } else {
+                this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+              }
+            })
+            .catch(e => {
+              this.$buefy.toast.open({ message: e, type: 'is-danger'});
+              console.log(e);
+            })
+          }
+      })
+    },
+    changePasswordDialog() {
+      this.$buefy.dialog.prompt({
+          message: 'Введите новый пароль',
+          confirmText: 'Подтвердить',
+          cancelText: 'Отмена',
+          inputAttrs: {
+            placeholder: 'Пароль',
+            maxlength: 15
+          },
+          trapFocus: true,
+          onConfirm: (value) => {
+            this.$http.post(API_URL+'/users/password', { password: value })
+            .then(response => {
+              if (response.status == 200) {
+                this.$buefy.toast.open({ message: 'Пароль изменен', type: 'is-success'});
+              } else {
+                this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+              }
+            })
+            .catch(e => {
+              this.$buefy.toast.open({ message: e, type: 'is-danger'});
+              console.log(e);
+            })
+          }
+      })
+    },
+    deleteAccountDialog() {
+      this.$buefy.dialog.confirm({
+        title: 'Удаление аккаунта',
+        message: 'Вы уверены, что хотите <b>удалить</b> ваш аккаунт? Это действие нельзя отменить.',
+        confirmText: 'Удалить',
+        cancelText: 'Отмена',
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: () => {
+          this.$http.delete(API_URL+'/users/delete')
+          .then(response => {
+            if (response.status == 200) {
+              this.$buefy.toast.open('Аккаунт удален');
+              this.$store.dispatch('logout')
+              .then(() => {
+                this.$router.push('/')
+              })
+            } else {
+              this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+            }
+          })
+          .catch(e => {
+            this.$buefy.toast.open({ message: e, type: 'is-danger'});
+            console.log(e);
+          })
+        }
       })
     }
   },

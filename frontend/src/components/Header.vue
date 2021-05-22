@@ -37,7 +37,17 @@
                 <p :v-if="findedInstruments==null">Не найдено</p>
               </section>
               <section v-else>
-                <b-table
+                <table class="table">
+                  <tbody>
+                    <tr v-for="instr in findedInstruments" v-bind:key="instr.secid">
+                      <th>{{ instr.secid }}</th>
+                      <th>{{ instr.name }}</th>
+                      <th>{{ instr.type }}</th>
+                    </tr>    
+                  </tbody>
+                </table>
+                
+                <!-- <b-table
                   :data="findedInstruments"
                   narrowed
                 >
@@ -50,13 +60,8 @@
                   <b-table-column field="type" v-slot="props">
                     {{ props.row.type }}
                   </b-table-column>
-
-                </b-table>
+                </b-table> -->
               </section>
-
-            
-
-              
             </section>
           </div>
         </div>
@@ -143,23 +148,6 @@ export default {
       authStatus: '',
       dropdownMenuStatus: false,
       isLoading: true,
-      knownInstruments: [
-        {
-          id: 'AFLT',
-          name: 'Aeroflot',
-          type: 'Акции'
-        },
-        {
-          id: 'GAZP',
-          name: 'Gazprom',
-          type: 'Акции'
-        },
-        {
-          id: 'AAPL',
-          name: 'Apple',
-          type: 'Акции'
-        }
-      ],
       findedInstruments: null,
       columns: [
         { field: 'id' },
@@ -186,7 +174,34 @@ export default {
       this.fetchSecurity(this.search);
     },
     onSubmit() {
-      this.$router.push({ name: 'QuoteForecast', params: { name: this.search }})
+      if (this.findedInstruments != null) {
+        let c_name = 'history';
+        if (document.cookie.length > 0) {
+          let c_start = document.cookie.indexOf(c_name + "=");
+          if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            let c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) {
+                c_end = document.cookie.length;
+            }
+            let arr = JSON.parse(document.cookie.substring(c_start, c_end));
+            let index = arr.indexOf(this.search);
+            if (index > -1) {
+              arr.splice(index, 1)
+            }
+            arr.unshift(this.search);
+            if (arr.length > 5) {
+              arr.pop();
+            }
+            let json_arr = JSON.stringify(arr);
+            document.cookie = "history="+json_arr;
+          }
+        } else {
+          let json_arr = JSON.stringify([this.search])
+          document.cookie = "history="+json_arr
+        }
+        this.$router.push({ name: 'QuoteForecast', params: { name: this.search }})
+      }
     },
     changedAuthStatus() {
       self.authStatus = this.$store.authStatus;
@@ -204,7 +219,7 @@ export default {
       this.$http.get(API_URL + '/security/' + id)
       .then(response => {
         if (response.status == 200) {
-          this.findedInstruments = response.data.securities;
+          this.findedInstruments = [response.data.security];
         } 
       })
       .finally(() => {

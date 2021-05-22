@@ -1,5 +1,8 @@
+from re import I
 from flask import Blueprint, make_response, jsonify
 import requests
+import xmltodict
+import feedparser
 
 bp = Blueprint('news', __name__, url_prefix='/api/news')
 
@@ -53,6 +56,18 @@ def get_moex_news_by_id(id):
     }
     resp = make_response(
         jsonify({'result': d}), 200
+    )
+    resp.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return resp
+
+
+@bp.route('/investing', methods=['GET'])
+def get_investing_news():
+    # url = 'https://ru.investing.com/rss/news.rss'
+    url = 'https://ru.investing.com/rss/news_25.rss'
+    d = feedparser.parse(url)
+    resp = make_response(
+        jsonify({'entries': d.entries[:9]}), 200
     )
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     return resp

@@ -1,4 +1,3 @@
-import json
 from sqlalchemy import Column, String, Integer, DateTime, ARRAY
 from passlib.hash import pbkdf2_sha256
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired

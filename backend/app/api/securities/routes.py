@@ -6,14 +6,29 @@ import requests
 
 from app.repository import securities_repo, users_repo
 from app.models import User
-from app.api.users import login_required
 
 
 bp = Blueprint('security', __name__, url_prefix='/api/security')
 
-@bp.route('', methods=['GET'])
-def security():
-    return "pong", 200
+@bp.route('', methods=['POST'])
+def get_securities():
+    try:
+        body = request.get_json()
+        securities = body.get('ids')
+    except:
+        return "incorrect request body", 400
+    
+    result = []
+    for s in securities:
+        res = securities_repo.get_security_by_id(s)
+        del res['_id']
+        result.append(res)
+    resp = make_response(
+        jsonify({'securities': result}), 200
+    )
+    resp.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return resp
+
 
 
 def json_decoder_security_info(arr):
@@ -28,12 +43,11 @@ def json_decoder_security_info(arr):
 
 @bp.route('/<string:security_id>', methods=['GET'])
 def get_security_by_id(security_id):
-    securities = securities_repo.get_securities_by_id(security_id)
-    if not securities:
-        return "not found securities with this ID", 404
+    security = securities_repo.get_security_by_id(security_id)
+    if not security:
+        return "not found security with this ID", 404
 
-    print(securities)
-    response_body = json_util.dumps({'securities': securities})
+    response_body = json_util.dumps({'security': security})
     resp = make_response(
         response_body, 200
     )
@@ -56,43 +70,53 @@ def get_security_description(security):
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     return resp
 
-###
 
-def get_curr_price_and_name(security_id):
+def get_current_price(security_id):
+    "Получить текущую цену инструмента, цену на момент начала торгов в этот день"
     URL = "http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/57/securities/{0}.json"\
         .format(security_id)
     r = requests.get(URL)
     data = r.json()
-    return data['securities']['data'][0][3], data['securities']['data'][0][2]
+    return data['marketdata']['data'][0][9], data['marketdata']['data'][0][12]
 
 
 def get_last_price(security_id, from_date, till_date):
+    "Получить цену инструмента по закрытию торгов в указанный период (период для случая, когда заданная дата - выходной)"
     URL = "http://iss.moex.com/iss/history/engines/stock/" + \
         "markets/shares/sessions/total/boardgroups/57/securities/"+\
         "{0}.json?from={1}&till={2}".format(security_id, from_date, till_date)
     r = requests.get(URL)
     data = r.json()
+    if not data['history']['data']:
+        return None
     last_price = data['history']['data'][-1][11]
     return last_price
     
 
 def get_procent(base, value):
+    "Получить изменение стоимости инструмента в процентном выражении"
+    if not value:
+        return 0
+    # print(base, value)
     division = value / base
     if division > 0:
-        division = round((division-1) * 100)
+        division = round((division-1) * 10000) / 100
     else:
-        division = round((1 - division) * 100) * -1
+        division = round((1 - division) * 10000) / 100 * -1
     return division
 
 
-def get_history_of_security(security_id):    
+def get_history_of_security(security_id):
+    "Получить историю стоимости заданного финансового инструмента"    
     today = date.today()
     week = timedelta(days=7)
     month = timedelta(days=31)
     year = timedelta(days=365)
     gap = timedelta(days=3)
     
-    curr_price, name = get_curr_price_and_name(security_id)
+    security = securities_repo.get_securities_by_id(security_id)[0]
+    # print(security)
+    curr_price, start_price = get_current_price(security_id)
     week_price = get_last_price(
         security_id, 
         (today-week-gap).strftime("%Y-%m-%d"), 
@@ -110,9 +134,9 @@ def get_history_of_security(security_id):
     )
     result = {
         'id': security_id,
-        'name': name,
+        'name': security['name'],
         'price': curr_price,
-        'day': 0,
+        'day': get_procent(curr_price, start_price),
         'week': get_procent(curr_price, week_price),
         'month': get_procent(curr_price, month_price),
         'year': get_procent(curr_price, year_price),
@@ -121,6 +145,27 @@ def get_history_of_security(security_id):
     }
     return result
 
+
+def get_general_history(securities):
+    "Получить историю общей стоимости финансовых инструментов из списка"
+    res = {
+        'day': 0,
+        'week': 0,
+        'month': 0,
+        'year': 0
+    }
+    for sec in securities:
+        res['day'] += sec['day']
+        res['week'] += sec['week']
+        res['month'] += sec['month']
+        res['year'] += sec['year']
+
+    N = len(securities)
+    res['day'] = round(res['day'] / N * 100) / 100
+    res['week'] = round(res['week'] / N * 100) / 100
+    res['month'] = round(res['month'] / N * 100) / 100
+    res['year'] = round(res['year'] / N * 100) / 100
+    return res
 
 @bp.route('/subscriptions', methods=['GET'])
 def get_subscriptions():
@@ -142,9 +187,14 @@ def get_subscriptions():
     results = []
     for sub in user.subscriptions:
         results.append(get_history_of_security(sub))
-    
-    print(results)
-    resp_body = jsonify({'subscriptions': results})
+    general = get_general_history(results)
+
+    subs = {
+        'general': general,
+        'securities': results
+    }
+    resp_body = jsonify({'subscriptions': subs})
+    # print(resp_body)
     resp = make_response(resp_body, 200)
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     return resp    
@@ -192,7 +242,7 @@ def get_number_of_candles(start_date: datetime, interval: int):
 
 
 def get_interval_in_minutes(interval: int):
-    "Получение интервалов из формата москвоской биржи в минуты"
+    "Преобразование интервалов свечей из формата москвоской биржи в минуты"
     intervals = [1, 10, 60, 24, 7, 31, 4]
     if interval in intervals[:3]:
         return interval
