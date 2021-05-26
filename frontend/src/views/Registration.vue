@@ -20,6 +20,14 @@
               </b-field> -->
               <!-- type="is-danger"
               message="This email is invalid" -->
+              <b-field label="Имя пользователя">
+                <b-input type="username"
+                  maxlength="15"
+                  placeholder="имя пользователя"
+                  v-model="username"
+                >
+                </b-input>
+              </b-field>
               <b-field label="Электронная почта">
                 <b-input type="email"
                   maxlength="30"
@@ -64,20 +72,27 @@ export default {
       email: null,
       password: null,
       password_confirmation: null,
+      username: null,
       label_type: null,
       label_text: null
     }
   },
   methods: {
     register() {
-      let email = this.email;
-      let password = this.password;
-      let pass_conf = this.password_confirmation;
-      if (password != pass_conf) {
+      let eml = this.email;
+      let pswd = this.password;
+      let pswd_conf = this.password_confirmation;
+      let urnm = this.username;
+      if (pswd != pswd_conf) {
         this.label_type = 'is-danger';
         this.label_text = 'Пароли не совпадают'
       } else {
-        this.$store.dispatch('register', { email, password })
+        let d = {
+          email: eml,
+          password: pswd,
+          username: urnm
+        }
+        this.$store.dispatch('register', { user: d })
         .then(() => this.$router.push('/'))
         .catch(err => {
           console.log(err);

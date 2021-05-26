@@ -94,10 +94,10 @@
                 v-for="k in [0,1,2]"
                 v-bind:key="k.id">
                 
-              <div class="tile is-child box" >
-                <a v-bind:href="investingNews[v+k].link" target="_blank">
+              <div class="tile is-child box" @click="goToAnotherSite(investingNews[v+k].link)">
+                <!-- <a v-bind:href="" target="_blank"> -->
                   <strong>{{ investingNews[v+k].title }}</strong>
-                </a>
+                <!-- </a> -->
                 <p>
                   <span class="tag is-info is-light mr-2">{{ investingNews[v+k].author }}</span>
 
@@ -228,6 +228,9 @@ export default {
       .finally(() => {
         this.isInvestingNewsLoading = false;
       })
+    },
+    goToAnotherSite(site) {
+      window.open(site);
     }
   },
   data() {

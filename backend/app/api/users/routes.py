@@ -2,26 +2,36 @@ from flask import Blueprint, request, make_response, jsonify
 
 from app.models import User
 from app.repository import users_repo as repo
-from .decorator import login_required
+from datetime import datetime
 
 bp = Blueprint('users', __name__, url_prefix='/api/users')
 
-from flask_httpauth import HTTPBasicAuth
 
 
 @bp.route('', methods=['POST', 'GET', 'DELETE'])
 def user():
     if request.method == 'POST':
-        body = request.get_json()
-        email = body.get('email')
-        password = body.get('password')
+        try:
+            body = request.get_json()
+            user = body.get('user')
+            email = user.get('email')
+            password = user.get('passowrd')
+            username = user.get('username')
+
+        except:
+            return "incorrect request body", 400
 
         user = repo.get_user_by_email(email=email)
         if user:
             return "user exist", 400
         
         try:
-            user = repo.create_user(email=email, password=password)
+            user = repo.create_user(
+                email=email, 
+                password=password,
+                username=username,
+                reg_date=datetime.now()
+            )
         except:
             return "internal error", 500
         

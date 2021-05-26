@@ -63,31 +63,29 @@
                   :disabled="isIntervalAvailable(4)"
                 ></b-menu-item>
             </b-menu-list>
-
+          </b-menu> 
+          <b-menu class="mt-3">
             <b-menu-list label="Алгоритмы" icon="chart-areaspline" > 
-              <b-menu-item label="MA" 
+              <b-menu-item label="HWES" 
                 icon="vector-line" 
-                @click="selectedAlgo = 'ma'"></b-menu-item>
-              <b-menu-item label="ARMA" 
-                icon="vector-line" 
-                @click="selectedAlgo = 'arma'"></b-menu-item>
+                @click="selectedAlgo = 'HWES'"
+                :disabled="loading"
+              ></b-menu-item>
               <b-menu-item label="ARIMA" 
                 icon="vector-line" 
-                @click="selectedAlgo = 'arima'"></b-menu-item>
+                @click="selectedAlgo = 'ARIMA'"
+                :disabled="loading"
+              ></b-menu-item>
               <b-menu-item label="SARIMA" 
                 icon="vector-line" 
-                @click="selectedAlgo = 'sarima'"></b-menu-item>
-
+                @click="selectedAlgo = 'SARIMA'"
+                :disabled="loading"
+              ></b-menu-item>
             </b-menu-list>
-          </b-menu> 
+          </b-menu>
         </div>
 
         <div class="column" ref="graphColumn">
-          <!-- <Graph 
-            :tabIndex="period" 
-            :interval="interval"
-            :algo="selectedAlgo"
-          ></Graph> -->
           <GraphTradingVue 
             :tabIndex="period" 
             :interval="interval"
@@ -127,18 +125,10 @@
 
       </div>
     </section>
-
-    <!-- <section class="section mx-6">
-      <h1 class="title">
-        Идеи
-      </h1>
-    </section> -->
-
   </div>
 </template>
 
 <script>
-// import Graph from '@/components/Graph.vue'
 import GraphTradingVue from '@/components/GraphTradingVue.vue'
 
 export default {
@@ -201,6 +191,7 @@ export default {
     }
   },
   methods: {
+    
     isIntervalAvailable(interval) {
       let intervals = [1, 10, 60, 24, 7, 31, 4];
       let interval_slice = null;

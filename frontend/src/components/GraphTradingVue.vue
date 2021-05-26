@@ -1,18 +1,19 @@
 <template>
-  <div class="graph">
+  <div class="graph-trading-vue">
     <b-skeleton 
       size="is-large" 
       v-if="loading" 
       :animated="true"
-      :height="600"
+      :height="800"
     ></b-skeleton>
     <section class v-if="!loading">
         <trading-vue 
           :data="graph" 
           :titleTxt="this.$route.params.name"
-          :indexBased="true"
           :width="this.width"
+          :overlays="overlays"
           :height="600"
+          :chart-config=" { DEFAULT_LEN: 110 } "
           :color-back="'#fff'"
           :color-grid="'#eee'"
           :color-text="'#333'">
@@ -25,6 +26,7 @@
 <script>
 import axios from 'axios'
 import API_URL from '../common/config'
+import PredictionsOverlay from '@/components/PredictionsOverlay.vue'
 import TradingVue from 'trading-vue-js'
 
 export default {
@@ -46,14 +48,31 @@ export default {
       errored: false,
       error_text: null,
 
+      time_gap: 1000 * 60 * 60 * 3,
+
       graph: {
           chart: {
           type: "Candles",
           data: [],
-          indexBased: true
-        }
-      },
+          indexBased: true,
+        },
+        onchart: [
+          {
+            name: 'Predictions',
+            type: 'Splitters',
+            data: [
+              [Date.now() + 1000 * 60 * 60 * 3, "Pritet", 1, "#34a853", 0.75],
+            ],
+            settings: {
+              font: '10x Arial'
+            }
+          },
+        ],
+        offchart: [
 
+        ]
+      },
+      overlays: [PredictionsOverlay],
       intervals: {
         'day': 1000 * 60 * 60 * 24,
         'week': 1000 * 60 * 60 * 24 * 7,
@@ -64,7 +83,7 @@ export default {
   },
   computed: {
     startDate: function() {
-      return new Date(this.getInterval(this.tabIndex));
+      return new Date(this.getStartDate(this.tabIndex));
     }
   },
   created() {
@@ -74,22 +93,26 @@ export default {
   watch: {
     $route: 'getCandles',
     startDate: function() {
+      this.graph.onchart = [];
+      this.graph.offchart = [];
       this.getCandles();
-      this.getPrediction();
+      // this.getPrediction();
     },
     interval: function() {
+      this.graph.onchart = [];
+      this.graph.offchart = [];
       this.getCandles();
-      this.getPrediction();
+      // this.getPrediction();
     },
     algo: function() {
-      this.candles[0]['data'].pop();
-      this.chartOptions.annotations.points.pop();
-      this.chartOptions.annotations.xaxis.pop();
       this.getPrediction();
     }
   },
   methods: {
     getCandles() {
+      this.graph.onchart = [];
+      this.graph.offchart = [];
+      this.$parent.loading = true;
       this.candles = this.error_text = null;
       this.errored = this.candles_is_empty = false;
       this.loading = true;
@@ -108,70 +131,60 @@ export default {
         }
       })
       .catch(e => {
-        console.log(e);
         this.errored = true;
         this.error_text = e;
       })
       .finally(() => {
         this.loading = false;
+        this.$parent.loading = false;
       })
     },
     getPrediction() {
       this.loading = true;
-      let algo = this.algo;
-      axios.post(API_URL+'/tasks/'+algo, this.candles[0])
+      this.$parent.loading = true;
+      let curr_algo = this.algo;
+      let body = {
+        candles: this.graph.chart.data,
+        algo: curr_algo,
+        count: 25
+      }
+      axios.post(API_URL+'/tasks', body)
       .then(resp => {
-        console.log(resp);
-        let info = resp.data;
-        // let point = {
-        //   x: '2021-04-26 18:00:00',
-        //   y: 50
-        // }
-        let candle = {
-          x: info['date'],
-          y: [info['prediction'], info['prediction'], info['prediction'], info['prediction']]
+        let predictions = resp.data.prediction.values;
+        let last_timestamp = this.graph.chart.data[this.graph.chart.data.length-1][0];
+        let curr_interval = this.interval;
+        let time_interval = this.getTimeFromInterval(curr_interval);
+        let points = []
+        for (let i = 0; i < predictions.length; i++) {
+          let point_with_data = [last_timestamp + time_interval * (i+1), predictions[i]]
+          points.push(point_with_data)
         }
-        this.candles[0]['data'].push(candle);
-        let p = {
-              x: info['date'],
-              y: info['prediction'],
-              borderColor: '#FF4560',
-              marker: {
-                size: 8,
-              },
-              label: {
-                borderColor: '#FF4560',
-                text: 'Прогноз',
-                orientation: 'vertical',
-              }
+        let spline = {
+            name: curr_algo,
+            type: 'Spline',
+            data: points,
+            settings: {
+              lineWidth: 4
             }
-
-        let xas = {
-              x: info['date'],
-              borderColor: '#FF6B6B',
-              // label: {
-              //   borderColor: '#FF6B6B',
-              //   style: {
-              //     fontSize: '13px',
-              //     color: '#fff',
-              //     background: '#FF6B6B'
-              //   },
-              //   orientation: 'vertical',
-              //   // offsetY: 7,
-              //   text: 'Это прогноз стоимости мудила'
-              // }
-            }
-        this.chartOptions.annotations.points.push(p);
-        this.chartOptions.annotations.xaxis.push(xas);
+          }
+        console.log(points)
+        // let point = null;
+        // if (info < this.graph.chart.data[this.graph.chart.data.length-1][1]) {
+        //   point = [Date.now() + this.time_gap, 0,  info, curr_algo];
+        // } else {
+        //   point = [Date.now() + this.time_gap, 1,  info, curr_algo];
+        // }
+        this.graph.offchart.push(spline)
       })
       .catch(err => {
         console.log(err);
       })
       .finally(() => {
         this.loading = false;
+        this.$parent.loading = false;
       })
     },
-    getInterval(value) {
+    getStartDate(value) {
       switch (value) {
         case 0:
           return Date.now() - this.intervals['day'];
@@ -189,6 +202,26 @@ export default {
           return Date.now();
       }
     },
+    // Get time in milliseconds from moex interval value
+    getTimeFromInterval(interval) {
+      switch (interval) {
+        case 1:
+          return 1000 * 60
+        case 10:
+          return 1000 * 60 * 10
+        case 60:
+          return 1000 * 60 * 60
+        case 24:
+          return 1000 * 60 * 60 * 24
+        case 7:
+         return 1000 * 60 * 60 * 24 * 7
+        case 31:
+          return 1000 * 60 * 60 * 24 * 31
+        case 4:
+          return 1000 * 60 * 60 * 24 * 31 * 3
+      }
+      return -1
+    }
   }
 }
 </script>

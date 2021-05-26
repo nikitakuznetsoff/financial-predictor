@@ -304,6 +304,7 @@ def get_candles(security):
 
     # graph_info = get_graph_info(candles)
     graph_info_tradingvue = get_graph_info_tradingvue(candles)
+    # print(graph_info_tradingvue[-1])
     # print(graph_info_tradingvue[0])
 
     # resp_body = jsonify({'data': graph_info})

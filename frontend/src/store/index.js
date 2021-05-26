@@ -30,6 +30,10 @@ export default new Vuex.Store({
             state.token = '';
         }
     },
+    getters: {
+        isLoggedIn: state => !!state.token,
+        authStatus: state => state.status,
+    },
     actions: {
         login({commit}, user) {
             return new Promise((resolve, reject) => {
@@ -78,8 +82,4 @@ export default new Vuex.Store({
             })
         },
     },
-    getters: {
-        isLoggedIn: state => !!state.token,
-        authStatus: state => state.status,
-    }
 })

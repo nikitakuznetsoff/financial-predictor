@@ -11,11 +11,11 @@ class PostgresRepository:
     def set_session(self, Session):
         self.Session = Session
 
-    def create_user(self, email, password):
+    def create_user(self, email, password, username, reg_date):
         user = None
         with self.Session() as session:
             
-            user = User(email=email)
+            user = User(email=email, username=username, registration=reg_date)
             user.hash_password(password)
             try:
                 session.add(user)

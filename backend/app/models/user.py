@@ -24,16 +24,6 @@ class User(Base):
     def verify_password(self, password):
         return pbkdf2_sha256.verify(password, self.password)
 
-    def get_dict_repr(self):
-        d = {
-            'id': self.id,
-            'email': self.email,
-            'registration': self.registration.strftime("%Y-%m-%d %H:%M:%S"),
-            'subscriptions': self.subscriptions,
-            'username': self.username
-        }
-        return d
-
     def generate_auth_token(self, expiration=6000):
         s = Serializer(Config.SECRET_KEY, expires_in=expiration)
         return s.dumps({ 'id': self.id })
@@ -48,6 +38,17 @@ class User(Base):
         except BadSignature:
             return None
         return data['id']
+
+    
+    def get_dict_repr(self):
+        d = {
+            'id': self.id,
+            'email': self.email,
+            'registration': self.registration.strftime("%Y-%m-%d %H:%M:%S"),
+            'subscriptions': self.subscriptions,
+            'username': self.username
+        }
+        return d
 
 
 
