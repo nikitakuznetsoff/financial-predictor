@@ -13,17 +13,19 @@ def user():
     if request.method == 'POST':
         try:
             body = request.get_json()
-            user = body.get('user')
-            email = user.get('email')
-            password = user.get('passowrd')
-            username = user.get('username')
-
+            email = body.get('email')
+            password = body.get('password')
+            username = body.get('username')
         except:
             return "incorrect request body", 400
 
         user = repo.get_user_by_email(email=email)
         if user:
-            return "user exist", 400
+            return "user exist", 409
+
+        user = repo.get_user_by_username(username=username)
+        if user:
+            return "user exist", 409
         
         try:
             user = repo.create_user(
@@ -100,7 +102,7 @@ def auth_post():
 
         user = repo.get_user_by_email(email)
         if not user:
-            return "unknown user", 404
+            return "unregistered user", 404
         if not user.verify_password(password):
             return "incorrect password", 400
         
@@ -188,10 +190,10 @@ def unsubscribe():
     except:
         return "incorrect request body", 400
     
-    # try:
-    repo.remove_user_subscriptions(user.id, secid)
-    # except:
-    #     return "server error", 500
+    try:
+        repo.remove_user_subscriptions(user.id, secid)
+    except:
+        return "server error", 500
     return "unsubscription successful", 200
 
 

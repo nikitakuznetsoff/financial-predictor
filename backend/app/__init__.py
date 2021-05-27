@@ -11,7 +11,7 @@ from app.api.tasks import tasks_blueprint
 
 application = Flask(__name__)
 
-application.config['secret'] = 'asd'
+application.config['secret'] = 'mysecretvalue'
 
 application.register_blueprint(news_blueprint)
 application.register_blueprint(securities_blueprint)

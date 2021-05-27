@@ -194,7 +194,8 @@ export default {
             this.$http.post(API_URL+'/users/username', { username: value })
             .then(response => {
               if (response.status == 200) {
-                this.$buefy.toast.open({ message: 'Имя пользователя изменено', type: 'is-success'});
+                // this.$buefy.toast.open({ message: 'Имя пользователя изменено', type: 'is-success'});
+                this.$buefy.toast.open({ message: 'Данное имя пользователя уже используется', type: 'is-danger'});
               } else {
                 this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
               }
@@ -267,7 +268,7 @@ export default {
         type: 'is-danger',
         hasIcon: true,
         onConfirm: () => {
-          this.$http.delete(API_URL+'/users/delete')
+          this.$http.delete(API_URL+'/users')
           .then(response => {
             if (response.status == 200) {
               this.$buefy.toast.open('Аккаунт удален');

@@ -65,15 +65,9 @@ class Predictor(object):
 
 
     def get_arima_predictions(self, candles, prediction_length):
-        # best_params = self.__parameters_selection_arima(candles)
-        # print(best_params)
-        best_params = (1,1,1)
+        best_params = self.__parameters_selection_arima(candles)
         forecasts = self.__get_forecasts(candles, prediction_length, best_params)
         return forecasts
-        # model = ARIMA(candles, order=best_params)
-        # model_fit = model.fit()
-        # result = model_fit.forecast(steps=prediction_length)
-        # return result.tolist()
 
 
     def get_sarima_predictions(self, candles, prediction_length):

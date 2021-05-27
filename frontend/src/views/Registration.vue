@@ -87,19 +87,20 @@ export default {
         this.label_type = 'is-danger';
         this.label_text = 'Пароли не совпадают'
       } else {
-        let d = {
-          email: eml,
-          password: pswd,
-          username: urnm
-        }
-        this.$store.dispatch('register', { user: d })
+        this.$store.dispatch('register', { email: eml, password: pswd, username: urnm })
         .then(() => this.$router.push('/'))
         .catch(err => {
-          console.log(err);
-          this.$buefy.toast.open({
-            type: 'is-danger',
-            message: err.response.data
-          });
+          if (err.response.status == 409) {
+            this.$buefy.toast.open({
+              type: 'is-danger',
+              message: 'Пользователь с указанными параметрами уже зарегистрирован'
+            });
+          } else {
+            this.$buefy.toast.open({
+              type: 'is-danger',
+              message: err.response.data
+            });
+          }
         })
       }
     }

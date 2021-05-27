@@ -22,7 +22,7 @@
                     </b-input>
                 </b-field>
 
-                <b-checkbox>Запомнить меня</b-checkbox>
+                <!-- <b-checkbox>Запомнить меня</b-checkbox> -->
             </section>
             <footer class="modal-card-foot">
                 <input type="submit" class="button is-primary" value="Войти">
@@ -48,11 +48,23 @@ export default {
             this.$store.dispatch('login', { email, password })
             .then(() => this.$router.push('/'))
             .catch(err => {
-                console.log(err);
-                this.$buefy.toast.open({
-                    type: 'is-danger',
-                    message: err.response.data
-                });
+                if (err.response.status == 404) {
+                    this.$buefy.toast.open({
+                        type: 'is-danger',
+                        message: 'Пользователь не найден. Зарегистрируйтесь для использоваения платформы.'
+                    }); 
+                } else if (err.response.status == 400) {
+                    this.$buefy.toast.open({
+                        type: 'is-danger',
+                        message: 'Неверный пароль'
+                    }); 
+                } else {
+                   this.$buefy.toast.open({
+                        type: 'is-danger',
+                        message: err.response.data
+                    }); 
+                }
+                
             })
         }
     }

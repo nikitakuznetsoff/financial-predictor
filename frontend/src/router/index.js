@@ -50,14 +50,6 @@ const routes = [
     ]
   },
   {
-    path: '/account',
-    name: 'Account',
-    component: () => import('@/views/Account.vue'),
-    meta: {
-      title: DEFAULT_TITLE + ' | Account'
-    }
-  },
-  {
     path: '/news/:id',
     name: 'News',
     component: () => import('@/views/NewsItem.vue'),

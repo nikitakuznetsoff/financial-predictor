@@ -200,7 +200,7 @@ export default {
         }
       } else {
         this.history = [];
-        this.isHistoryLoading = false;
+        this.isHistoryLoading = true;
       }
     },
     getNews() {

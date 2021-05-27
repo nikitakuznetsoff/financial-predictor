@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <section class="hero is-light">
+    <!-- <section class="hero is-light">
       <div class="hero-body mx-6">
         <div class="title">
           {{ this.$route.params.name }} Новости
@@ -122,9 +122,8 @@
             </div>
           </template>
         </b-carousel-list>
-
       </div>
-    </section>
+    </section> -->
   </div>
 </template>
 

@@ -4,7 +4,7 @@
       size="is-large" 
       v-if="loading" 
       :animated="true"
-      :height="800"
+      :height="600"
     ></b-skeleton>
     <section class v-if="!loading">
         <trading-vue 
@@ -26,7 +26,6 @@
 <script>
 import axios from 'axios'
 import API_URL from '../common/config'
-import PredictionsOverlay from '@/components/PredictionsOverlay.vue'
 import TradingVue from 'trading-vue-js'
 
 export default {
@@ -72,7 +71,6 @@ export default {
 
         ]
       },
-      overlays: [PredictionsOverlay],
       intervals: {
         'day': 1000 * 60 * 60 * 24,
         'week': 1000 * 60 * 60 * 24 * 7,
@@ -174,7 +172,7 @@ export default {
         // } else {
         //   point = [Date.now() + this.time_gap, 1,  info, curr_algo];
         // }
-        this.graph.offchart.push(spline)
+        this.graph.onchart.push(spline)
       })
       .catch(err => {
         console.log(err);

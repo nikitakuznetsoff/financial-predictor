@@ -1,7 +1,7 @@
 from sqlalchemy import select, update, delete
 from datetime import datetime
 
-from app.models import Task, User
+from app.models import User
 
 
 class PostgresRepository:
@@ -50,11 +50,19 @@ class PostgresRepository:
             user = session.query(User).filter(User.email == email).first()
         return user
 
+    def get_user_by_username(self, username):
+        with self.Session() as session:
+            user = session.query(User).filter(User.username == username).first()
+        return user
+
     def add_user_subscription(self, user_id, secid):
         with self.Session() as session:
             user = session.query(User).filter(User.id == user_id).first()
             subs = user.subscriptions
-            subs.append(secid)
+            if not subs:
+                subs = [secid]
+            else:
+                subs.append(secid)
 
             session.execute(
                 update(User)
@@ -77,29 +85,29 @@ class PostgresRepository:
             session.commit()
         return user
     
-    def create_task(self):
-        dt = datetime.now()
-        with self.Session() as session:
-            task = Task(is_completed=False, datetime=dt)
-            try:
-                session.add(task)
-            except:
-                session.roolback()
-            else:
-                session.commit()
+    # def create_task(self):
+    #     dt = datetime.now()
+    #     with self.Session() as session:
+    #         task = Task(is_completed=False, datetime=dt)
+    #         try:
+    #             session.add(task)
+    #         except:
+    #             session.roolback()
+    #         else:
+    #             session.commit()
 
-        result = None
-        with self.Session() as session:
-            stmt = select(Task).filter_by(datetime=dt)
-            result = session.execute(stmt).first()
-        return result
+    #     result = None
+    #     with self.Session() as session:
+    #         stmt = select(Task).filter_by(datetime=dt)
+    #         result = session.execute(stmt).first()
+    #     return result
 
-    def get_task_status(self, id):
-        result = None
-        with self.Session() as session:
-            stmt = select(Task).filter_by(id=id)
-            result = session.execute(stmt).first()
-        return result
+    # def get_task_status(self, id):
+    #     result = None
+    #     with self.Session() as session:
+    #         stmt = select(Task).filter_by(id=id)
+    #         result = session.execute(stmt).first()
+    #     return result
 
     def change_username(self, user_id, username):
         user = None

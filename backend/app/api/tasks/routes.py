@@ -20,7 +20,7 @@ def tasks():
         predictions_number = body.get('count')
     except:
         "incorrect request body", 400
-
+    print(candles)
     cndls = [x[1] for x in candles]
     prediction = []
     if algo == "ARIMA":
