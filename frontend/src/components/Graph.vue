@@ -8,7 +8,7 @@
     ></b-skeleton>
     <section class v-if="!loading">
         <!-- start date: {{ startDate }} -->
-        <apexchart type="candlestick" :options="chartOptions" :series="candles" height="600"></apexchart>
+        <!-- <apexchart type="candlestick" :options="chartOptions" :series="candles" height="600"></apexchart> -->
     </section>
     
   </div>

@@ -1,5 +1,5 @@
-import asyncio
-import aiohttp
+# import asyncio
+# import aiohttp
 import json
 import requests
 from datetime import datetime
@@ -36,34 +36,34 @@ class MongoRepository:
         return result
 
 
-    async def _get_description_from_moex(self, security_id):
-         async with aiohttp.ClientSession() as session:
-            url = 'http://iss.moex.com/iss/securities/{0}.json'.format(security_id)
-            async with session.get(url) as response:
-                data = response.text()
-                return data
+    # async def _get_description_from_moex(self, security_id):
+    #      async with aiohttp.ClientSession() as session:
+    #         url = 'http://iss.moex.com/iss/securities/{0}.json'.format(security_id)
+    #         async with session.get(url) as response:
+    #             data = response.text()
+    #             return data
     
 
     # Получение информации о финансовом инструменте
-    def get_security_description(self, security_id):
-        loop = asyncio.get_event_loop()
-        description = loop.run_until_complete(self._get_description(security_id))
+    # def get_security_description(self, security_id):
+    #     loop = asyncio.get_event_loop()
+    #     description = loop.run_until_complete(self._get_description(security_id))
 
-        # Если описания нет в монге, то идем на биржу
-        if not description:
-            data = loop.run_until_complete(self._get_description_from_moex(security_id))
-            if not data:
-                return None
+    #     # Если описания нет в монге, то идем на биржу
+    #     if not description:
+    #         data = loop.run_until_complete(self._get_description_from_moex(security_id))
+    #         if not data:
+    #             return None
 
-            data_decoded = json.loads(data)
-            data_changed = self._change_security_description_format(data_decoded)
+    #         data_decoded = json.loads(data)
+    #         data_changed = self._change_security_description_format(data_decoded)
             
-            result = loop.run_until_complete(self._insert_description(data_changed))
-            if not result:
-                return None
+    #         result = loop.run_until_complete(self._insert_description(data_changed))
+    #         if not result:
+    #             return None
 
-            description = data_changed
-        return description
+    #         description = data_changed
+    #     return description
 
 
     def get_security_by_id(self, security_id):
@@ -97,14 +97,14 @@ class MongoRepository:
         return candles
 
 
-    async def _get_candles_from_moex(self, security_id, interval, start_date):
-        async with aiohttp.ClientSession() as session:
-            url = 'http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/'+\
-                '57/securities/{0}/candles.json?from={1}&interval={2}'\
-                .format(security_id, start_date, interval)
-            async with session.get(url) as response:
-                data = response.text()
-                return json.loads(data)
+    # async def _get_candles_from_moex(self, security_id, interval, start_date):
+    #     async with aiohttp.ClientSession() as session:
+    #         url = 'http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/'+\
+    #             '57/securities/{0}/candles.json?from={1}&interval={2}'\
+    #             .format(security_id, start_date, interval)
+    #         async with session.get(url) as response:
+    #             data = response.text()
+    #             return json.loads(data)
 
 
     # Получение свечей по заданным параметрам
@@ -123,7 +123,7 @@ class MongoRepository:
 
     def get_candles(self, security_id, interval, start_date):
         total_number_of_candles = self._get_number_of_required_candles(interval, start_date)
-        candles = self.client.finPredictor.candles.find({
+        candles = self.client.candles.find({
             "index": security_id,
             "interval": interval,
             "start_date": { "$gte": start_date }

@@ -6,11 +6,12 @@ from .postgres import PostgresRepository
 from .mongo import MongoRepository
 
 
-from app.config import Config
+from app.config import Config, HerokuConfig
 from app.models import Base
 
 conf = Config()
-POSTGRES_DSN = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
+# conf = HerokuConfig()
+POSTGRES_DSN = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(
     conf.POSTGRES_USERNAME, 
     conf.POSTGRES_PASSWORD, 
     conf.POSTGRES_HOST, 
@@ -25,15 +26,15 @@ users_repo = PostgresRepository()
 users_repo.set_session(Session)
 
 
-MONGO_DSN = 'mongodb://{0}:{1}@{2}:{3}/{4}'.format(
+MONGO_DSN = 'mongodb://{0}:{1}@{2}/{4}'.format(
     conf.MONGO_USERNAME,
     conf.MONGO_PASSWORD,
     conf.MONGO_HOST,
     conf.MONGO_PORT,
     conf.MONGO_DBNAME
 )
+# MONGO_DSN = 'mongodb+srv://{0}:{1}@cluster0.zi8rm.mongodb.net/finpred?retryWrites=true&w=majority'.format(conf.MONGO_USERNAME, conf.MONGO_PASSWORD)
 mongo_client = MongoClient(MONGO_DSN)
-# mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DSN)
 securities_repo = MongoRepository()
 securities_repo.set_client(mongo_client)
 

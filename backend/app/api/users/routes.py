@@ -27,18 +27,24 @@ def user():
         if user:
             return "user exist", 409
         
-        try:
-            user = repo.create_user(
-                email=email, 
-                password=password,
-                username=username,
-                reg_date=datetime.now()
-            )
-        except:
-            return "internal error", 500
+        user = repo.create_user(
+            email=email, 
+            password=password,
+            username=username,
+            reg_date=datetime.now()
+        )
+        # try:
+        #     user = repo.create_user(
+        #         email=email, 
+        #         password=password,
+        #         username=username,
+        #         reg_date=datetime.now()
+        #     )
+        # except:
+        #     return "internal error", 500
         
         user = repo.get_user_by_email(email=email)
-        token = user.generate_auth_token()
+        token = user.generate_auth_token().decode('utf-8')
         resp = make_response(jsonify({'user': user.id, 'token': token}), 200)
         return resp
     
@@ -106,7 +112,7 @@ def auth_post():
         if not user.verify_password(password):
             return "incorrect password", 400
         
-        token = user.generate_auth_token()
+        token = user.generate_auth_token().decode('utf-8')
         d = { 'user': user.id, 'token': token }
         resp = make_response(jsonify(d), 200)
         return resp
@@ -222,6 +228,10 @@ def change_user_username():
     except:
         return "incorrect request body", 400
 
+    user = repo.get_user_by_username(username)
+    if user:
+        return "username already  used", 409
+
     user = repo.change_username(user_id, username)
     if not user:
         return "interval error", 500
@@ -254,6 +264,9 @@ def change_user_email():
     except:
         return "incorrect request body", 400
 
+    user = repo.get_user_by_email(email)
+    if user:
+        return "email already used", 409
     user = repo.change_email(user_id, email)
     if not user:
         return "interval error", 500

@@ -14,16 +14,17 @@ class PostgresRepository:
     def create_user(self, email, password, username, reg_date):
         user = None
         with self.Session() as session:
-            
             user = User(email=email, username=username, registration=reg_date)
             user.hash_password(password)
-            try:
-                session.add(user)
-            except Exception as e:
-                session.roolback()
-                raise
-            else:
-                session.commit()
+            session.add(user)
+            session.commit()
+            # try:
+            #     session.add(user)
+            # except Exception as e:
+            #     session.roolback()
+            #     raise
+            # else:
+            #     session.commit()
         return user
 
 

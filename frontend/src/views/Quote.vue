@@ -47,7 +47,7 @@
                       </ul>
                     </div>
 
-                    <div class="level-right">
+                    <div class="level-right" v-if="isAuthorized">
                       <section v-if="subscriptionLoading">
                         <b-skeleton 
                           size="is-large" 
@@ -100,6 +100,7 @@ export default {
       subscriptionLoading: true,
       subscriptions: null,
       isSubscribed: false,
+      isAuthorized: false,
 
       period: 0,
       interval: 1,
@@ -156,16 +157,22 @@ export default {
       this.$http.get(API_URL + '/users/subscriptions')
       .then(response => {
         if (response.status == 200) {
+          this.isAuthorized = true;
           this.subscriptions = response.data.subscriptions;
-          if (this.subscriptions.includes(this.quote.secid)) {
-            this.isSubscribed = true;
-          } else {
+          if (this.subscriptions == null) {
             this.isSubscribed = false;
+          } else {
+            if (this.subscriptions.includes(this.quote.secid)) {
+              this.isSubscribed = true;
+            } else {
+              this.isSubscribed = false;
+            }
           }
         }
       })
       .catch((e) => {
         console.log(e);
+        this.isAuthorized = false;
       })
       .finally(() => {
         this.subscriptionLoading = false;
@@ -175,8 +182,7 @@ export default {
       this.$http.post(API_URL + '/users/subscribe', {'secid': this.quote.secid})
       .then(() => {
         console.log('Subscription successful');
-        this.subscriptions.push(this.quote.secid);
-        this.isSubscribed = true;
+        this.getSubscriptions();
       })
       .catch((e) => {
         console.log(e);

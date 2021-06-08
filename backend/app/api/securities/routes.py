@@ -2,7 +2,6 @@ from flask import Blueprint, json, make_response, jsonify, request
 from datetime import datetime, timedelta, date
 from bson import json_util
 
-import requests
 
 from app.repository import securities_repo, users_repo
 from app.models import User
@@ -73,6 +72,9 @@ def get_subscriptions():
     if not user:
         return "incorrect user id", 400
     
+    if not user.subscriptions:
+        "user hasn't subscriptions", 204
+
     general, securities = moex_api.get_subscriptions_history(user.subscriptions)
     result = {
         'general': general,
@@ -96,7 +98,7 @@ def get_candles(security):
     except ValueError:
         return "incorrect start date format", 400
     
-    candles = moex_api.get_candles(interval, start_date_dt)
+    candles = moex_api.get_candles(security, interval, start_date_dt)
     resp_body = jsonify({'candles': candles})
     resp = make_response(resp_body, 200)
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'

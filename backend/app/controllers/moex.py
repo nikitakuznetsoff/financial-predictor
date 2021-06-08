@@ -8,7 +8,7 @@ class MoexAPI:
         self.repo = repo
 
 
-    def __json_decoder_security_info(arr):
+    def __json_decoder_security_info(self, arr):
         result = {}
         for v in arr:
             result[v[0]] = {
@@ -29,13 +29,16 @@ class MoexAPI:
         decoded_info = self.__json_decoder_security_info(info['description']['data'])
         return decoded_info
 
-    def get_current_price(self, security_id):
+
+    def __get_current_price(self, security_id):
         "Получить текущую цену инструмента, цену на момент начала торгов в этот день"
         URL = "http://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/57/securities/{0}.json"\
             .format(security_id)
         r = requests.get(URL)
         data = r.json()
-        return data['marketdata']['data'][0][9], data['marketdata']['data'][0][12]
+        # print("ASD")
+        # print(data['marketdata']['data'][0][9])
+        return data['securities']['data'][0][3], data['securities']['data'][0][-6]
 
 
 
@@ -45,11 +48,15 @@ class MoexAPI:
         URL = "http://iss.moex.com/iss/history/engines/stock/" + \
             "markets/shares/sessions/total/boardgroups/57/securities/"+\
             "{0}.json?from={1}&till={2}".format(security_id, from_date, till_date)
+        # print("HELLO")
+        # print(from_date, till_date)
         r = requests.get(URL)
         data = r.json()
         if not data['history']['data']:
             return None
         last_price = data['history']['data'][-1][11]
+        # print("HEY")
+        # print(last_price)
         return last_price
         
 
@@ -75,6 +82,8 @@ class MoexAPI:
         
         security = self.repo.get_securities_by_id(security_id)[0]
         curr_price, start_price = self.__get_current_price(security_id)
+        print("PRIVET")
+        print(curr_price, start_price)
         week_price = self.__get_last_price(
             security_id, 
             (today-week-gap).strftime("%Y-%m-%d"), 

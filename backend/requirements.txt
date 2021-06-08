@@ -1,7 +1,10 @@
 flask
-sqlalchemy
+psycopg2
+SQLAlchemy
 itsdangerous
 passlib
 requests
 dnspython
-motor
+pymongo
+feedparser
+flask_cors

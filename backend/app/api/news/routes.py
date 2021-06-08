@@ -1,7 +1,5 @@
-from re import I
 from flask import Blueprint, make_response, jsonify
 import requests
-import xmltodict
 import feedparser
 
 bp = Blueprint('news', __name__, url_prefix='/api/news')

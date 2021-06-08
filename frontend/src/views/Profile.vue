@@ -43,7 +43,7 @@
             ></b-skeleton>
           </section>
           <section v-else>
-            <section v-if="user.subscriptions == null">
+            <section v-if="user.subscriptions == null || user.subscriptions.length == 0">
               <div class="has-text-centered mt-6 mb-6">
                 <b-icon
                   icon="message-bulleted-off"
@@ -194,15 +194,18 @@ export default {
             this.$http.post(API_URL+'/users/username', { username: value })
             .then(response => {
               if (response.status == 200) {
-                // this.$buefy.toast.open({ message: 'Имя пользователя изменено', type: 'is-success'});
-                this.$buefy.toast.open({ message: 'Данное имя пользователя уже используется', type: 'is-danger'});
+                this.$buefy.toast.open({ message: 'Имя пользователя изменено', type: 'is-success'});
               } else {
-                this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+                this.$buefy.toast.open({ message: response.statusText, type: 'is-success'});
               }
             })
             .catch(e => {
-              this.$buefy.toast.open({ message: e, type: 'is-danger'});
-              console.log(e);
+              if (e.respnse.status == 409) {
+                this.$buefy.toast.open({ message: 'Данное имя пользователя уже используется', type: 'is-danger'});
+              } else {
+                this.$buefy.toast.open({ message: e, type: 'is-danger'});
+              }
+              // console.log(e);
             })
           }
       })
@@ -223,12 +226,16 @@ export default {
               if (response.status == 200) {
                 this.$buefy.toast.open({ message: 'Электронная почта изменена', type: 'is-success'});
               } else {
-                this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+                this.$buefy.toast.open({ message: response.statusText, type: 'is-success'});
               }
             })
             .catch(e => {
-              this.$buefy.toast.open({ message: e, type: 'is-danger'});
-              console.log(e);
+              if (e.reponse.status == 409) {
+                this.$buefy.toast.open({ message: 'Данная электронная почта уже используется', type: 'is-danger'});
+              } else {
+                this.$buefy.toast.open({ message: e, type: 'is-danger'});
+              }
+              // console.log(e);
             })
           }
       })
@@ -249,7 +256,7 @@ export default {
               if (response.status == 200) {
                 this.$buefy.toast.open({ message: 'Пароль изменен', type: 'is-success'});
               } else {
-                this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+                this.$buefy.toast.open({ message: response.statusText, type: 'is-success'});
               }
             })
             .catch(e => {
@@ -277,7 +284,7 @@ export default {
                 this.$router.push('/')
               })
             } else {
-              this.$buefy.toast.open({ message: response.statusText, type: 'is-danger'});
+              this.$buefy.toast.open({ message: response.statusText, type: 'is-success'});
             }
           })
           .catch(e => {

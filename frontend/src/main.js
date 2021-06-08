@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
-import VueApexCharts from 'vue-apexcharts'
 import Axios from 'axios'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
@@ -16,8 +15,6 @@ if (token) {
 }
 
 Vue.use(Buefy)
-Vue.use(VueApexCharts)  
-Vue.component('apexchart', VueApexCharts)
 
 Vue.config.productionTip = false
 

@@ -15,4 +15,4 @@ for stock in data['securities']['data']:
       'currency': stock[16],
       'type': 'Акции'
     }
-    client.finPredictor.securities.insert_one(d)
+    client.finPredictor.test.insert_one(d)

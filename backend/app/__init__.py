@@ -18,4 +18,7 @@ application.register_blueprint(securities_blueprint)
 application.register_blueprint(users_blueprint)
 application.register_blueprint(tasks_blueprint)
 
+
 CORS(application)
+
+  
